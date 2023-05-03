@@ -1,12 +1,12 @@
 
 from rest_framework.response import Response
-
 from django.contrib.auth import authenticate, login
-from rest_framework.decorators import api_view
+#from rest_framework.decorators import api_view
 from rest_framework import generics, viewsets, status
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.views import APIView
 from rest_framework.generics import RetrieveAPIView
+from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth import authenticate, login
 from .serializers import (
     RegistrationSerializer, CreatePasswordSerializer, 
@@ -67,15 +67,20 @@ class LoginAPIView(RetrieveAPIView):
         if user is not None:
             if user.is_active:
                 login(request, user)
+                refresh = RefreshToken.for_user(user)
+                print(refresh.access_token)
                 response = {
                     'success': True,
                     'status_code': status.HTTP_200_OK,
                     'message': 'login successful',
-                    'token':  serializer.data['token'],
+                    'refresh_token': str(refresh),
+                    'access_token': str(refresh.access_token),
+                    #'token':  serializer.data['token'],
                     'firstName': self.request.user.user_profile.first_name,
                     'surname': self.request.user.user_profile.last_name,
                     'id': self.request.user.id,
                     'email': self.request.user.email,
+                    'is_admin': self.request.user.is_superuser
                     
                 }
                 status_code = status.HTTP_200_OK

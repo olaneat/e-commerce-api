@@ -19,7 +19,7 @@ class UserProfileModel(models.Model):
     phone_number = PhoneNumberField(blank=True, null=True)
     email= models.EmailField()
     country = models.CharField(max_length=255, blank=True, null=True)
-
+    dispaly_image = models.ImageField(upload_to='asset/display-img', blank=True)
 
 @receiver(post_save, sender=CustomUser)
 def create_profile(sender, instance, created, **kwargs):

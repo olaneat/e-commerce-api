@@ -21,7 +21,8 @@ class CreateProductSerializer(serializers.ModelSerializer):
     
     
 
-class ListProductListSerializer(serializers.ModelSerializer):
+class ListProductSerializer(serializers.ModelSerializer):
+    category = serializers.CharField(source='category.name', read_only=True)
     class Meta:
         model = ProductModel
         fields = '__all__'
@@ -36,7 +37,7 @@ class CreateCategorySerializer(serializers.ModelSerializer):
 
 
 class CategorySerializer(serializers.ModelSerializer):
-    category = CreateProductSerializer(many=True, read_only=True)
+    category = serializers.SlugRelatedField(many=True, slug_field='name', read_only=True)
 
 
     def create(self, validated_data):
@@ -49,7 +50,7 @@ class CategorySerializer(serializers.ModelSerializer):
 
     class Meta: 
         model = CategoryModel
-        fields  = [ 'name', 'slug', 'category']
+        fields  = [ 'name', 'slug', 'category', 'id']
 
 
     '''

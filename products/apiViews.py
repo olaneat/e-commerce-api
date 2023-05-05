@@ -1,7 +1,7 @@
 from rest_framework import generics
 from .serializers import (CategorySerializer, 
                           CreateProductSerializer, 
-                          ListProductListSerializer, 
+                          ListProductSerializer, 
                           CreateCategorySerializer
                         )
 from .models import ProductModel, CategoryModel
@@ -17,7 +17,7 @@ class CreateProductAPIView(generics.CreateAPIView):
 
 class ListProductAPIView(generics.ListAPIView):
     lookup_field = 'id'
-    serializer_class = ListProductListSerializer
+    serializer_class = ListProductSerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
     queryset = ProductModel.objects.all()
 
@@ -25,27 +25,23 @@ class ListProductAPIView(generics.ListAPIView):
 
 class ProductDetailAPIView(generics.RetrieveAPIView):
     lookup_field = 'id'
-    serializer_class = CategorySerializer
-    permission_classes = [permissions.IsAuthenticated]
+    serializer_class = ListProductSerializer
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
     queryset = ProductModel.objects.all()
     
     
-
 class UpdateProductAPIView(generics.UpdateAPIView):
     lookup_field = 'id'
     serializer_class = CreateProductSerializer
-    permission_classes = [permissions.IsAdminUser]
-    def get_queryset(self, id):
-        queryset = ProductModel.objects.get(id=id)
-        return queryset
-   
+    permission_classes = [permissions.IsAuthenticated]
+    queryset = ProductModel.objects.all()
+    
 class DeleteProductAPIView(generics.DestroyAPIView):
     lookup_field = 'id'
     serializer_class = CreateProductSerializer
     permission_classes = [permissions.IsAdminUser]
-    def get_queryset(self, id):
-        queryset = ProductModel.objects.get(id=id)
-        return queryset
+    queryset = ProductModel.objects.all()
+    
 
 class CreateCatogoeryAPIView(generics.CreateAPIView):
     lookup_field = 'id'
@@ -57,11 +53,8 @@ class CreateCatogoeryAPIView(generics.CreateAPIView):
 class UpdateCategoryAPIView(generics.UpdateAPIView):
     lookup_field = 'id'
     serializer_class = CategoryModel
-    permission_classes = [permissions.IsAdminUser]
-
-    def get_queryset(self):
-         queryset = CategoryModel.object.get(id=self.id)
-         return queryset
+    permission_classes = [permissions.IsAuthenticated]
+    queryset = CategoryModel.objects.all()
     
 
 class CategoryListAPIView(generics.ListAPIView):

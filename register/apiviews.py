@@ -68,7 +68,6 @@ class LoginAPIView(RetrieveAPIView):
             if user.is_active:
                 login(request, user)
                 refresh = RefreshToken.for_user(user)
-                print(refresh.access_token)
                 response = {
                     'success': True,
                     'status_code': status.HTTP_200_OK,

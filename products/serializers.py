@@ -39,38 +39,39 @@ class CreateCategorySerializer(serializers.ModelSerializer):
 
 
 class CategorySerializer(serializers.ModelSerializer):
-    category = serializers.SlugRelatedField(many=True, slug_field='name', read_only=True)
+    products = serializers.SlugRelatedField(many=True, slug_field='name', read_only=True)
 
 
     def create(self, validated_data):
-        products =validated_data.pop('category')
+        print(validated_data)
+        goods =validated_data.pop('products')
         category = CategoryModel.objects.create(**validated_data)
-        for product in products:
+        for product in goods:
             ProductModel.objects.create(category=category, product=product)
         return category
 
 
     class Meta: 
         model = CategoryModel
-        fields  = [ 'name', 'slug', 'category', 'id']
+        fields  = [ 'name', 'slug', 'products', 'id']
 
-class CreateManufactuererSerializer(serializers.ModelSerializer):
-    manufacturer = serializers.SlugRelatedField(many=True, slug_field='name',read_only=True )
+class ListManufactuererSerializer(serializers.ModelSerializer):
+    products = serializers.SlugRelatedField(many=True, slug_field='name',read_only=True )
 
     def create(self, validated_data):
-        products = validated_data.pop('manufacturer')
+        print(validated_data)
+        goods = validated_data.pop('products')
         manufacturer = ManufacturerModel.objects.create(**validated_data)
-        for product in products:
+        for product in goods:
             ProductModel.objects.create(manufacturer=manufacturer, product=product)
         return manufacturer
     
     class Meta:
         model = ManufacturerModel
-        fields = ['id', 'name', 'slug', 'manufacturer']
+        fields = ['id', 'name', 'slug', 'products']
 
 
-class ListManufacturerSerializer(serializers.ModelSerializer):
-
+class CreateManufacturerSerializer(serializers.ModelSerializer):
     class Meta:
         model = ManufacturerModel
         fields = '__all__'

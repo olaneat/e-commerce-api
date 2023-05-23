@@ -3,8 +3,8 @@ from .serializers import (CategorySerializer,
                           CreateProductSerializer, 
                           ListProductSerializer, 
                           CreateCategorySerializer,
-                          ListManufacturerSerializer,
-                          CreateManufactuererSerializer
+                          CreateManufacturerSerializer,
+                          ListManufactuererSerializer
                         )
 from .models import ProductModel, CategoryModel, ManufacturerModel
 from rest_framework import permissions
@@ -74,26 +74,26 @@ class DeleteCategoryAPIView(generics.DestroyAPIView):
 
 class CreateManufacturerAPIView(generics.CreateAPIView):
     lookup_field = 'id'
-    serializer_class = CreateManufactuererSerializer
+    serializer_class = CreateManufacturerSerializer
     permission_classes = [permissions.IsAuthenticated]
     queryset = ManufacturerModel.objects.all()
 
 
 class UpdateManufacturerAPIView(generics.UpdateAPIView):
     lookup_field = 'id'
-    serializer_class = CreateManufactuererSerializer
+    serializer_class = CreateManufacturerSerializer
     permission_classes = [permissions.IsAuthenticated]
     queryset = ManufacturerModel.objects.all()
     
 
 class ManufacturerListAPIView(generics.ListAPIView):
     lookup_field = 'id'
-    serializer_class = ListManufacturerSerializer
+    serializer_class = ListManufactuererSerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
     queryset = ManufacturerModel.objects.all()
 
 class DeleteManufacturerAPIView(generics.DestroyAPIView):
     lookup_field = 'id'
-    serializer_class = ListManufacturerSerializer
+    serializer_class = ListManufactuererSerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
     queryset = ManufacturerModel.objects.all()

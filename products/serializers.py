@@ -68,7 +68,7 @@ class ListManufactuererSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = ManufacturerModel
-        fields = ['id', 'name', 'slug', 'products']
+        fields = ['id', 'name', 'slug', 'img', 'products']
 
 
 class CreateManufacturerSerializer(serializers.ModelSerializer):

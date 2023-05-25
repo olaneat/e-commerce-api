@@ -65,6 +65,12 @@ class CategoryListAPIView(generics.ListAPIView):
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
     queryset = CategoryModel.objects.all()
 
+class CategoryDetailAPIView(generics.RetrieveAPIView):
+    lookup_field = 'id'
+    serializer_class = CategorySerializer
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    queryset = CategoryModel.objects.all()
+
 class DeleteCategoryAPIView(generics.DestroyAPIView):
     lookup_field = 'id'
     serializer_class = CategorySerializer
@@ -86,6 +92,7 @@ class UpdateManufacturerAPIView(generics.UpdateAPIView):
     queryset = ManufacturerModel.objects.all()
     
 
+
 class ManufacturerListAPIView(generics.ListAPIView):
     lookup_field = 'id'
     serializer_class = ListManufactuererSerializer
@@ -96,4 +103,10 @@ class DeleteManufacturerAPIView(generics.DestroyAPIView):
     lookup_field = 'id'
     serializer_class = ListManufactuererSerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    queryset = ManufacturerModel.objects.all()
+
+class ManufacturerDetailAPIView(generics.RetrieveAPIView):
+    lookup_field = 'id'
+    serializer_class = CreateManufacturerSerializer
+    permission_classes = [permissions.IsAuthenticated]
     queryset = ManufacturerModel.objects.all()

@@ -2,6 +2,10 @@ from django.db import models
 from uuid import uuid4
 from register.models import CustomUser
 from cloudinary.models import CloudinaryField
+from django.db.models.signals import post_save, pre_delete
+from django.dispatch import receiver
+
+
 # Create your models here.
 
 
@@ -36,19 +40,36 @@ class ManufacturerModel(models.Model):
         verbose_name_plural = 'Manufacturers'
 
 
+
+
+
 class ProductModel(models.Model):    
     id = models.UUIDField(primary_key=True, editable=False, unique=True, default=uuid4)
-    name = models.CharField(max_length=255)
-    description = models.TextField()
+    name = models.CharField(max_length=255, blank=True,null=True)
+    description = models.TextField(blank=True,null=True)
     created_on = models.DateTimeField(auto_now_add=True, )
-    manufacturer = models.ForeignKey(ManufacturerModel, on_delete=models.RESTRICT, related_name='products', blank=True, null=True)
-    price = models.DecimalField(decimal_places=2, max_digits=10 )
+    manufacturer = models.ForeignKey(ManufacturerModel, on_delete=models.RESTRICT, related_name='product_manufacturer', blank=True, null=True)
+    price = models.DecimalField(decimal_places=2, max_digits=10, blank=True,null=True )
     slug = models.SlugField(max_length=250, blank=True, null=True)
     update_at = models.DateTimeField(auto_now_add=True,)
-    category  = models.ForeignKey(CategoryModel, on_delete=models.RESTRICT, related_name='products', blank=True, null=True)
-    img = CloudinaryField('image')
+    category  = models.ForeignKey(CategoryModel, on_delete=models.RESTRICT, related_name='product_category', blank=True, null=True)
+    img = CloudinaryField('image', blank=True,null=True)
     available= models.BooleanField(default=True)
     stock = models.IntegerField(default=1)
+    model = models.CharField(max_length=255, blank=True,null=True)
+    colour= models.CharField(max_length=255, blank=True,null=True)
+    weight = models.CharField(max_length=255, blank=True,null=True)
+    brand = models.CharField(max_length=255, blank=True,null=True)
+    ram = models.CharField(max_length=255, blank=True,null=True)
+    storage = models.CharField(max_length=255, blank=True,null=True)
+    rear_camera = models.CharField(max_length=255, blank=True,null=True)
+    front_camera = models.CharField(max_length=255, blank=True,null=True)
+    connectivity = models.CharField(max_length=255, blank=True,null=True)
+    processor = models.CharField(max_length=255, blank=True,null=True)
+    display = models.TextField( blank=True,null=True)
+    battery = models.CharField(max_length=255, blank=True,null=True)
+    platform = models.CharField(max_length=255, blank=True,null=True)
+
 
     class Meta:
         ordering = ('-created_on',)

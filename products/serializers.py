@@ -17,9 +17,54 @@ class CreateProductSerializer(serializers.ModelSerializer):
                 'category',
                 'price',         
                 'id',
-                'maunfacuturer'    
+                'manufacturer',
+                'model',
+                'colour',
+                'weight',
+                'brand',
+                'ram',
+                'storage',
+                'connectivity',
+                'display',
+                'battery',
+                'platform',
+                'processor',
+                'front_camera',
+                'rear_camera',
+                
             ]
 
+    
+class ProductDetailSerializer(serializers.ModelSerializer):
+    category = serializers.CharField(source='category.name', read_only=True)
+    manufacturer = serializers.CharField(source='manufacturer.name', read_only=True)
+    class Meta:
+        model = ProductModel
+        fields = [
+                'name', 
+                'description', 
+                'img',
+                'slug', 
+                'available',
+                'stock', 
+                'category',
+                'price',         
+                'id',
+                'manufacturer',
+                'model',
+                'colour',
+                'weight',
+                'brand',
+                'ram',
+                'storage',
+                'connectivity',
+                'display',
+                'battery',
+                'platform',
+                'processor',
+                'front_camera',
+                'rear_camera',
+            ]
     
     
 
@@ -32,49 +77,49 @@ class ListProductSerializer(serializers.ModelSerializer):
     
 
 class CreateCategorySerializer(serializers.ModelSerializer):
+    product_category = serializers.StringRelatedField(many=True)
     class Meta:
         model = CategoryModel
-        fields = '__all__' 
-
-
-
-class CategorySerializer(serializers.ModelSerializer):
-    products = serializers.SlugRelatedField(many=True, slug_field='name', read_only=True)
-
+        fields = '__all__'
 
     def create(self, validated_data):
         print(validated_data)
-        goods =validated_data.pop('products')
+        product_data = validated_data.pop('product_category')
         category = CategoryModel.objects.create(**validated_data)
-        for product in goods:
-            ProductModel.objects.create(category=category, product=product)
+        for product in product_data:
+            ProductModel.objects.create(category=category, **validated_data)
         return category
 
+class CategorySerializer(serializers.ModelSerializer):
+    #cat = serializers.SlugRelatedField(many=True, slug_field='name', read_only=True)    
 
     class Meta: 
         model = CategoryModel
-        fields  = [ 'name', 'slug', 'products', 'id']
+        fields  = [ 'name', 'slug', 'id']
 
 class ListManufactuererSerializer(serializers.ModelSerializer):
-    products = serializers.SlugRelatedField(many=True, slug_field='name',read_only=True )
-
-    def create(self, validated_data):
-        print(validated_data)
-        goods = validated_data.pop('products')
-        manufacturer = ManufacturerModel.objects.create(**validated_data)
-        for product in goods:
-            ProductModel.objects.create(manufacturer=manufacturer, product=product)
-        return manufacturer
+    product_manufacturer = serializers.StringRelatedField(many=True )
     
     class Meta:
         model = ManufacturerModel
-        fields = ['id', 'name', 'slug', 'img', 'products']
+        fields = ['id', 'name', 'slug', 'img', 'product_manufacturer']
 
 
 class CreateManufacturerSerializer(serializers.ModelSerializer):
+    product_manufacturer = serializers.StringRelatedField(many=True )
+    
     class Meta:
         model = ManufacturerModel
         fields = '__all__'
+
+
+    def create(self, validated_data):
+        print(validated_data)
+        product_data = validated_data.pop('product_manufacturer')
+        manufacturer = ManufacturerModel.objects.create(**validated_data)
+        for product in product_data:
+            ProductModel.objects.create(manufacturer=manufacturer, **validated_data)
+        return manufacturer
 
 
 
@@ -87,3 +132,4 @@ class CreateManufacturerSerializer(serializers.ModelSerializer):
             ProductModel.objects.create(category=category, product=product)
         return category
     '''
+

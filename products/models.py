@@ -60,15 +60,21 @@ class ProductModel(models.Model):
     colour= models.CharField(max_length=255, blank=True,null=True)
     weight = models.CharField(max_length=255, blank=True,null=True)
     brand = models.CharField(max_length=255, blank=True,null=True)
-    ram = models.CharField(max_length=255, blank=True,null=True)
+    wlan = models.CharField(max_length=255, blank=True,null=True)
     storage = models.CharField(max_length=255, blank=True,null=True)
     rear_camera = models.CharField(max_length=255, blank=True,null=True)
     front_camera = models.CharField(max_length=255, blank=True,null=True)
     connectivity = models.CharField(max_length=255, blank=True,null=True)
+    bluetooth = models.CharField(max_length=255, blank=True,null=True)
+    size = models.CharField(max_length=255, blank=True,null=True)
+    sku = models.CharField(max_length=255, blank=True,null=True)
+    line = models.CharField(max_length=255, blank=True,null=True)
     processor = models.CharField(max_length=255, blank=True,null=True)
     display = models.TextField( blank=True,null=True)
     battery = models.CharField(max_length=255, blank=True,null=True)
     platform = models.CharField(max_length=255, blank=True,null=True)
+    sim = models.CharField(max_length=255, blank=True,null=True)
+    memory = models.CharField(max_length=255, blank=True,null=True)
 
 
     class Meta:

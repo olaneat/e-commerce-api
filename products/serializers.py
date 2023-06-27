@@ -22,7 +22,7 @@ class CreateProductSerializer(serializers.ModelSerializer):
                 'colour',
                 'weight',
                 'brand',
-                'ram',
+                'wlan',
                 'storage',
                 'connectivity',
                 'display',
@@ -31,20 +31,28 @@ class CreateProductSerializer(serializers.ModelSerializer):
                 'processor',
                 'front_camera',
                 'rear_camera',
-                
+                'sku',
+                'line',
+                'size',
+                'sim',
+                'bluetooth',
+                'memory'
             ]
 
     
 class ProductDetailSerializer(serializers.ModelSerializer):
     category = serializers.CharField(source='category.name', read_only=True)
     manufacturer = serializers.CharField(source='manufacturer.name', read_only=True)
+    manufacturer_id = serializers.CharField(source='manufacturer.id', read_only=True)
+    
     class Meta:
         model = ProductModel
         fields = [
                 'name', 
                 'description', 
                 'img',
-                'slug', 
+                'slug',
+                'manufacturer_id', 
                 'available',
                 'stock', 
                 'category',
@@ -55,15 +63,21 @@ class ProductDetailSerializer(serializers.ModelSerializer):
                 'colour',
                 'weight',
                 'brand',
-                'ram',
+                'wlan',
                 'storage',
                 'connectivity',
                 'display',
+                'memory',
                 'battery',
                 'platform',
                 'processor',
                 'front_camera',
                 'rear_camera',
+                'sku',
+                'line',
+                'size',
+                'sim',
+                'bluetooth'
             ]
     
     
@@ -98,8 +112,14 @@ class CategorySerializer(serializers.ModelSerializer):
         fields  = [ 'name', 'slug', 'id']
 
 class ListManufactuererSerializer(serializers.ModelSerializer):
-    product_manufacturer = serializers.StringRelatedField(many=True )
     
+    class Meta:
+        model = ManufacturerModel
+        fields = ['id', 'name', 'slug', 'img']
+
+
+class ManufacturerDetailSerializer(serializers.ModelSerializer):
+    product_manufacturer = serializers.StringRelatedField(many=True )
     class Meta:
         model = ManufacturerModel
         fields = ['id', 'name', 'slug', 'img', 'product_manufacturer']

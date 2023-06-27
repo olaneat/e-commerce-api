@@ -1,17 +1,21 @@
 from rest_framework import generics
-from .serializers import (CategorySerializer, 
-                          ListProductSerializer, 
-                          CreateCategorySerializer,
-                          CreateManufacturerSerializer,
-                          ListManufactuererSerializer,
-                          CreateProductSerializer, ProductDetailSerializer
+from .serializers import (
+    CategorySerializer, 
+    ListProductSerializer, 
+    CreateCategorySerializer,
+    CreateManufacturerSerializer,
+    ListManufactuererSerializer,                     
+    CreateProductSerializer, 
+    ProductDetailSerializer,
+    ManufacturerDetailSerializer
+    )
 
-                        )
+from rest_framework.views import APIView
 from .models import ProductModel, CategoryModel, ManufacturerModel
 from rest_framework import permissions
 from rest_framework import status
 from rest_framework.views import Response
-
+from rest_framework import status
 
 class CreateProductAPIView(generics.CreateAPIView):
     lookup_field = 'id'
@@ -32,7 +36,7 @@ class ProductDetailAPIView(generics.RetrieveAPIView):
     serializer_class = ProductDetailSerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
     queryset = ProductModel.objects.all()
-    
+   
     
 class UpdateProductAPIView(generics.UpdateAPIView):
     lookup_field = 'id'
@@ -100,6 +104,17 @@ class ManufacturerListAPIView(generics.ListAPIView):
     serializer_class = ListManufactuererSerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
     queryset = ManufacturerModel.objects.all()
+
+
+class OtherProductsAPIView(APIView):
+
+    def get(self, request, id=None):
+        lookup_field = 'id'
+        products = ProductModel.objects.filter(manufacturer_id=id)
+        serializer =  ListProductSerializer(products, many=True)
+        permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+        return Response({'data':serializer.data, 'status': status.HTTP_200_OK, 'msg': 'products fetched successful'})
+
 
 class DeleteManufacturerAPIView(generics.DestroyAPIView):
     lookup_field = 'id'

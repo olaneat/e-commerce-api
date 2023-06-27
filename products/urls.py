@@ -5,7 +5,7 @@ from .apiViews import (
         CategoryListAPIView, ListProductAPIView, 
         DeleteCategoryAPIView, CreateProductAPIView,
         DeleteProductAPIView, ManufacturerListAPIView,
-        CreateManufacturerAPIView, UpdateManufacturerAPIView,
+        CreateManufacturerAPIView, UpdateManufacturerAPIView, OtherProductsAPIView,
         DeleteManufacturerAPIView, CategoryDetailAPIView, ManufacturerDetailAPIView,
     )
 
@@ -25,8 +25,6 @@ urlpatterns = [
     path('add-manufacturer', CreateManufacturerAPIView.as_view(), name='create-manufacturer'),
     path('update-manufacturer/<uuid:id>', UpdateManufacturerAPIView.as_view(), name='update-manufacturer'),
     path('list-manufacturer', ManufacturerListAPIView.as_view(), name='manufacturer-list'),
-    path('manufacturer-detail/<uuid:id>', ManufacturerDetailAPIView.as_view(), name='category-detail'),
+    path('manufacturer-detail/<uuid:id>', OtherProductsAPIView.as_view(), name='category-detail'),
     path('delete-manufacturer/<uuid:id>', DeleteManufacturerAPIView.as_view(), name='delete-manufacturer'),
-    
-
 ]   

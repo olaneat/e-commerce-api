@@ -85,18 +85,14 @@ AUTH_USER_MODEL = 'register.CustomUser'
 AUTHENTICATION_BACKENDS = ('django.contrib.auth.backends.ModelBackend',)
 
 REST_FRAMEWORK = {
-    'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.IsAuthenticated',
-    ]
-}
-
-REST_FRAMEWORK = {
-    
-    'DEFAULT_AUTHENTICATION_CLASSES': (
-
+   'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_simplejwt.authentication.JWTAuthentication',
-    )
 
+    ),
+    'DEFAULT_PERMISSION_CLASSES': (
+        'rest_framework.permissions.IsAuthenticated'
+    ),
+     'DATE_INPUT_FORMATS': [("%Y-%m-%d")],
 }
 
 

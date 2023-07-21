@@ -75,8 +75,8 @@ class LoginAPIView(RetrieveAPIView):
                     'refresh_token': str(refresh),
                     'access_token': str(refresh.access_token),
                     #'token':  serializer.data['token'],
-                    'firstName': self.request.user.user_profile.first_name,
-                    'surname': self.request.user.user_profile.last_name,
+                    'first_name': self.request.user.user_profile.first_name,
+                    'last_name': self.request.user.user_profile.last_name,
                     'id': self.request.user.id,
                     'email': self.request.user.email,
                     'is_admin': self.request.user.is_superuser

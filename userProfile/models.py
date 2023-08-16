@@ -16,7 +16,7 @@ class UserProfileModel(models.Model):
     created_at = models.DateTimeField(auto_now=True)
     state= models.CharField(max_length=255, blank=True, null=True)
     lga = models.CharField(max_length=255, blank=True, null=True)
-    phone_number = PhoneNumberField(blank=True, null=True)
+    phone_number = models.CharField(blank=True, null=True)
     
 @receiver(post_save, sender=CustomUser)
 def create_profile(sender, instance, created, **kwargs):

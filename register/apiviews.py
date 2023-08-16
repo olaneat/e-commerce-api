@@ -3,7 +3,7 @@ from rest_framework.response import Response
 from django.contrib.auth import authenticate, login
 #from rest_framework.decorators import api_view
 from rest_framework import generics, viewsets, status
-from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework import permissions 
 from rest_framework.views import APIView
 from rest_framework.generics import RetrieveAPIView
 from rest_framework_simplejwt.tokens import RefreshToken
@@ -14,7 +14,6 @@ from .serializers import (
     RequestNewPasswordSerializer
 )
 from register.models import CustomUser
-from . import permissions
 from register import serializers
 from django.utils.encoding import smart_str, force_str, DjangoUnicodeDecodeError, smart_bytes
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
@@ -25,13 +24,13 @@ from .utils import Utils
 
 
 class UserDetail(generics.RetrieveUpdateDestroyAPIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated]
     queryset = CustomUser.objects.all()
     serializer_class = RegistrationSerializer
 
 
 class RegistrationAPIView(APIView):
-    permission_classes = [AllowAny]
+    permission_classes = [permissions.AllowAny]
     serializer_class = RegistrationSerializer
 
     
@@ -54,7 +53,7 @@ class RegistrationAPIView(APIView):
 
 
 class LoginAPIView(RetrieveAPIView):
-    permission_classes = [AllowAny]
+    permission_classes = [permissions.AllowAny]
     serializer_class = LoginSerializer
 
     def post(self, request):
@@ -79,8 +78,7 @@ class LoginAPIView(RetrieveAPIView):
                     'last_name': self.request.user.user_profile.last_name,
                     'id': self.request.user.id,
                     'email': self.request.user.email,
-                    'is_admin': self.request.user.is_superuser
-                    
+                    'is_admin': self.request.user.is_superuser,
                 }
                 status_code = status.HTTP_200_OK
                 #print(data)
@@ -94,7 +92,7 @@ class LoginAPIView(RetrieveAPIView):
 class changePasswordAPIView(generics.UpdateAPIView):
     serializer_class = CreatePasswordSerializer
     models = CustomUser
-    permissions = (IsAuthenticated)
+    permission_classes = (permissions.IsAuthenticated,)
 
     def get_obj(self, queury_set=None):
         obj = self.request.user
@@ -186,18 +184,18 @@ class CreatePasswordAPI(generics.GenericAPIView):
 class ChangePasswordAPI(generics.UpdateAPIView):
     serializer_class = ChangePasswordSerializer
     queryset = CustomUser.objects.all()
-    permissions_classes = [IsAuthenticated]
+    permissions_classes = [permissions.IsAuthenticated]
 
 
 class DisplayUsers(generics.ListAPIView):
     queryset = CustomUser.objects.all()
     serializer_class = RegistrationSerializer
-    permissions_classes = [AllowAny]
+    permissions_classes = [permissions.AllowAny]
 
 
 class DeleteUser(generics.DestroyAPIView):
     serializer_class = RegistrationSerializer
-    permission_class = [IsAuthenticated]
+    permission_class = [permissions.IsAuthenticated]
 
     def get_queryset(self):
         return CustomUser.objects.get(id=self.user.id)

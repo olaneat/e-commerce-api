@@ -110,7 +110,7 @@ class changePasswordAPIView(generics.UpdateAPIView):
             response = {
                 'message': 'Password Successfully Changed',
                 'code': status.HTTP_201_OK,
-                'status': 'Success',
+                'status': 'Success', 
                 'data': [],
             }
 

@@ -76,7 +76,9 @@ DATABASES = {
         'NAME': 'e_commerce',
         'HOST': 'LOCALHOST',
         'USENAME':config('DB_USER'),
-        'PASSWORD': config('DB_PSWD')
+        'PASSWORD': config('DB_PSWD'),
+        'ENDPOINT': config('DB_ENDPOINT'),
+        'PORT': config('DB_PORT')
     }
 }
 

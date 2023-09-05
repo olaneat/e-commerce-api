@@ -74,9 +74,9 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'commerce',
-        'HOST': config('HOST'),
-        'USENAME':config('DB_USER'),
+        'USER':config('DB_USER'),
         'PASSWORD': config('DB_PSWD'),
+        'HOST': config('HOST'),
         'PORT': config('DB_PORT')
     }
 }

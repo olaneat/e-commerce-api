@@ -75,7 +75,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
         'NAME': 'e_commerce',
         'HOST': 'LOCALHOST',
-        'USENAME':config('DB_USER'),
+        'USER':config('DB_USER'),
         'PASSWORD': config('DB_PSWD')
     }
 }

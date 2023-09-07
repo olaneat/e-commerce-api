@@ -13,7 +13,7 @@ SECRET_KEY = config('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['localhost']
+ALLOWED_HOSTS = ['localhost', 'ec2-54-147-194-232.compute-1.amazonaws.com']
 CORS_ALLOWED_ORIGINS = ["http://localhost:4200", "http://localhost:3000"]
 
 
@@ -72,7 +72,7 @@ WSGI_APPLICATION = 'commerce.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql',
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
         'NAME': 'commerce',
         'USER':config('DB_USER'),
         'PASSWORD': config('DB_PSWD'),

@@ -13,7 +13,7 @@ SECRET_KEY = config('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['localhost', 'ec2-54-147-194-232.compute-1.amazonaws.com']
+ALLOWED_HOSTS = ['localhost', '35.168.165.72', 'ec2-35-168-165-72.compute-1.amazonaws.com']
 CORS_ALLOWED_ORIGINS = ["http://localhost:4200", "http://localhost:3000"]
 
 

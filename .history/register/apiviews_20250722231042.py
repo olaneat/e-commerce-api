@@ -79,7 +79,7 @@ class LoginAPIView(APIView):
                             'lastName': self.request.user.user_profile.last_name,
                             'id': self.request.user.id,
                             'email': self.request.user.email,
-                            'username': self.request.user.username,
+                            'username': self.request.user.email,
                         }
                     # 'first_name': self.request.user.user_profile.first_name,
                     # 'last_name': self.request.user.user_profile.last_name,

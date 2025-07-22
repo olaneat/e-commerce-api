@@ -109,7 +109,7 @@ class CategorySerializer(serializers.ModelSerializer):
 
     class Meta: 
         model = CategoryModel
-        fields  = [ 'name', 'slug', 'id']
+        fields  = [ 'name', 'slug', 'id', 'img']
 
 class ListManufactuererSerializer(serializers.ModelSerializer):
     

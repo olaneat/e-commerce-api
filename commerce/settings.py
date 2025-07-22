@@ -14,7 +14,7 @@ SECRET_KEY = config('SECRET_KEY')
 DEBUG = True
 
 ALLOWED_HOSTS = ['localhost']
-CORS_ALLOWED_ORIGINS = ["http://localhost:4200", "http://localhost:3000"]
+CORS_ALLOWED_ORIGINS = [ "http://localhost:5173"]
 
 
 # Application definition

@@ -74,18 +74,11 @@ class LoginAPIView(APIView):
                     'refresh_token': str(refresh),
                     'access_token': str(refresh.access_token),
                     #'token':  serializer.data['token'],
-                    "user": {
-                            'firstName':self.request.user.user_profile.first_name,
-                            'lastName': self.request.user.user_profile.last_name,
-                            'id': self.request.user.id,
-                            'email': self.request.user.email,
-                            'username': self.request.user.username,
-                        }
-                    # 'first_name': self.request.user.user_profile.first_name,
-                    # 'last_name': self.request.user.user_profile.last_name,
-                    # 'id': self.request.user.id,
-                    # 'email': self.request.user.email,
-                    # 'is_admin': self.request.user.is_superuser,
+                    'first_name': self.request.user.user_profile.first_name,
+                    'last_name': self.request.user.user_profile.last_name,
+                    'id': self.request.user.id,
+                    'email': self.request.user.email,
+                    'is_admin': self.request.user.is_superuser,
                 }
                 status_code = status.HTTP_200_OK
                 #print(data)

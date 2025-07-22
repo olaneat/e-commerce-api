@@ -11,8 +11,9 @@ from django.dispatch import receiver
 
 class CategoryModel(models.Model):
     id = models.UUIDField(unique=True, editable=False, primary_key=True, default=uuid4)
-    name = models.CharField(max_length=250 )
-    slug  = models.SlugField(max_length=250)
+    name = models.CharField(max_length=250, blank=True, null=True )
+    img = CloudinaryField('images/category', blank=True, null=True)
+    slug  = models.SlugField(max_length=250,  blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     class Meta: 
         verbose_name  = 'Category'

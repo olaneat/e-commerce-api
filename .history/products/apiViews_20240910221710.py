@@ -127,14 +127,3 @@ class ManufacturerDetailAPIView(generics.RetrieveAPIView):
     serializer_class = CreateManufacturerSerializer
     permission_classes = [permissions.IsAuthenticated]
     queryset = ManufacturerModel.objects.all()
-
-
-class ProductsByCategoryAPIView(APIView):
-
-    def get(self, request, id=None):
-        lookup_field = 'id'
-        products = ProductModel.objects.filter(category_id=id)
-        serializer =  ListProductSerializer(products, many=True)
-        permission_classes = [permissions.IsAuthenticatedOrReadOnly]
-        return Response({'data':serializer.data, 'status': status.HTTP_200_OK, 'msg': 'products fetched successful'})
-

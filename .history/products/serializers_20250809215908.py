@@ -86,7 +86,7 @@ class ListProductSerializer(serializers.ModelSerializer):
     category = serializers.CharField(source='category.name', read_only=True)
     class Meta:
         model = ProductModel
-        fields = ['name', 'id', 'category', 'price', 'img']
+        fields = ['name', 'id', 'category', 'price', 'img', 'product']
         print(fields)
 
     

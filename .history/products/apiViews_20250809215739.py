@@ -134,7 +134,7 @@ class ProductsByCategoryAPIView(APIView):
     def get(self, request, id=None):
         print(request, 'hello')
         lookup_field = 'id'
-        products = ProductModel.objects.filter(category_id=id)
+        products = ProductModel.objects.filter(category__id=id)
         serializer =  ListProductSerializer(products, many=True)
         permission_classes = [permissions.IsAuthenticatedOrReadOnly]
         return Response({'data':serializer.data, 'status': status.HTTP_200_OK, 'msg': 'products fetched successful'})

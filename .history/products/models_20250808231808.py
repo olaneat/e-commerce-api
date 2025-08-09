@@ -89,4 +89,5 @@ class ProductModel(models.Model):
 
 
 
-# class ReviewModel(models.Model):
+class ReviewModel(models.Model):
+    user 

@@ -31,6 +31,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework_simplejwt',
     'corsheaders',
+    'drf_yasg',
     "phonenumber_field",
 
     'register',
@@ -72,11 +73,11 @@ WSGI_APPLICATION = 'commerce.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'commerce',
-        'USER':config('DB_USER'),
-        'PASSWORD': config('ONLINE_DB_PSWD'),
-        'HOST': config('HOST'),
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': config('PGNAME'),
+        'USER':config('PGUSER'),
+        'PASSWORD': config('PGPASSWORD'),
+        'HOST': config('PGHOST', default='localhost'),
         'PORT': config('DB_PORT')
     }
 }

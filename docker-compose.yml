@@ -1,4 +1,3 @@
-version: '3.8'
 
 services:
   app:
@@ -9,7 +8,7 @@ services:
     ports:
       - "8000:8000"
     environment:
-      - SECRET_KEY=your-secret-key-here
+      - SECRET_KEY=django-insecure-g^w5$oj^unmw^p*(&jpb5klc1a7zn-#baxyj(a0+dqd=0+gy2*
       - DEBUG=1
       - DB_HOST=db
       - DB_NAME=yourdb
@@ -22,9 +21,9 @@ services:
   db:
     image: postgres:14
     environment:
-      - POSTGRES_DB=yourdb
-      - POSTGRES_USER=youruser
-      - POSTGRES_PASSWORD=yourpassword
+      - POSTGRES_DB=e_market
+      - POSTGRES_USER=olaneat
+      - POSTGRES_PASSWORD=password
     ports:
       - "5432:5432"
     volumes:

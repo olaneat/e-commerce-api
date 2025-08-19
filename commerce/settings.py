@@ -13,7 +13,7 @@ SECRET_KEY = config('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['localhost', '.vercel.app']
+ALLOWED_HOSTS = ['localhost', 'commerce.fly.dev']
 CORS_ALLOWED_ORIGINS = ["http://localhost:4200", "http://localhost:3000"]
 
 

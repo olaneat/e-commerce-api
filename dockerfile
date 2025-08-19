@@ -1,26 +1,30 @@
-FROM python:3.11-slim
+ARG PYTHON_VERSION=3.9-slim
 
-WORKDIR /app
+FROM python:${PYTHON_VERSION}
 
 ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
 
-# Install system dependencies for building packages
+# install psycopg2 dependencies.
 RUN apt-get update && apt-get install -y \
     libpq-dev \
     gcc \
-    python3-dev \
     && rm -rf /var/lib/apt/lists/*
 
-# Install dependencies
-COPY requirements.txt /app/
-RUN pip install --no-cache-dir -r requirements.txt
+RUN mkdir -p /code
 
-# Copy project
-COPY . /app/
+WORKDIR /code
 
-# Collect static files (optional)
+COPY requirements.txt /tmp/requirements.txt
+RUN set -ex && \
+    pip install --upgrade pip && \
+    pip install -r /tmp/requirements.txt && \
+    rm -rf /root/.cache/
+COPY . /code
+
+ENV SECRET_KEY "MhWdrrrZISomHd6Qz0PxBqKa32bjHNMdGe9DEKHBdS9RRN08yL"
 RUN python manage.py collectstatic --noinput
 
-# Run gunicorn
-CMD ["gunicorn", "--bind", "0.0.0.0:8000", "commerce.wsgi:application"]
+EXPOSE 8000
+
+CMD ["gunicorn","--bind",":8000","--workers","2","commerce.wsgi"]

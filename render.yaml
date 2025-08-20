@@ -12,9 +12,9 @@ services:
     buildCommand: './build.sh'
     startCommand: 'python -m gunicorn commerce.asgi:application -k uvicorn.workers.UvicornWorker'
     envVars:
-      - key: DATABASE_URL
+      - key: postgresql://olaneat:TqEfX3jjfbzhvfaEkKiII83UQrNUIwjb@dpg-d2j3p06mcj7s73ejpq8g-a.oregon-postgres.render.com/e_market_ranu
         fromDatabase:
-          name: commerce
+          name: e_market_ranu
           property: connectionString
       - key: SECRET_KEY
         generateValue: true

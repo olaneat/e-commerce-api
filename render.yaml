@@ -1,22 +1,19 @@
-databases:
-  - name: commerce
-    plan: free
-    databaseName: e_market_ranu
-    user: olaneat
-
 services:
   - type: web
-    plan: free
     name: commerce
-    runtime: python
-    buildCommand: './build.sh'
-    startCommand: 'python -m gunicorn commerce.asgi:application -k uvicorn.workers.UvicornWorker'
+    env: python
+    buildCommand: "./build.sh"
+    startCommand: "gunicorn commerce.wsgi:application --bind 0.0.0.0:$PORT"
     envVars:
-      - key: postgresql://olaneat:TqEfX3jjfbzhvfaEkKiII83UQrNUIwjb@dpg-d2j3p06mcj7s73ejpq8g-a.oregon-postgres.render.com/e_market_ranu
+      - key: DATABASE_URL
         fromDatabase:
-          name: e_market_ranu
+          name: commerce
           property: connectionString
       - key: SECRET_KEY
-        generateValue: true
-      - key: WEB_CONCURRENCY
-        value: 4
+        value: your-secure-secret-key
+      - key: DEBUG
+        value: "False"
+      - key: ALLOWED_HOSTS
+        value: "commerce.onrender.com"
+      - key: PYTHON_VERSION
+        value: "3.11"  # Enforce Python 3.11

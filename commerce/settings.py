@@ -14,8 +14,8 @@ SECRET_KEY = config('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['localhost', 'commerce.fly.dev']
-CORS_ALLOWED_ORIGINS = ["http://localhost:4200", "http://localhost:3000"]
+ALLOWED_HOSTS = ['localhost', 'e-marj.fly.dev']
+CORS_ALLOWED_ORIGINS = ["http://localhost:4200", "https://e-mrkt-api.onrender.com"]
 
 
 # Application definition

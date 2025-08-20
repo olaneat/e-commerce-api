@@ -1,5 +1,4 @@
-#!/usr/bin/env bash
-apt-get update -qq && apt-get install -y libpq-dev python3-dev libjpeg-dev zlib1g-dev
-pip install --upgrade pip
+python3.11 -m venv venv
+source venv/bin/activate
 pip install -r requirements.txt
-python manage.py collectstatic --noinput
+gunicorn commerce.wsgi:application --bind 0.0.0.0:8000

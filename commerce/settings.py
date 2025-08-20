@@ -5,6 +5,7 @@ import os
 from dotenv import load_dotenv
 from decouple import config
 import cloudinary
+import dj_databaseurl
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -41,6 +42,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware', 
     'django.contrib.sessions.middleware.SessionMiddleware',
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -70,17 +72,25 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'commerce.wsgi.application'
 
-
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': config('PGNAME'),
-        'USER':config('PGUSER'),
-        'PASSWORD': config('PGPASSWORD'),
-        'HOST': config('PGHOST', default='localhost'),
-        'PORT': config('PGPORT')
-    }
+    'default': dj_database_url.config(
+        # Replace this value with your local database's connection string.
+        default=dj_database_url.parse(os.environ.get('DB_URL')),
+        conn_max_age=600
+    )
 }
+
+# DATABASES = {
+#     "default": dj_database_url.parse(os.environ.get('DB_URL'))
+#     # 'default': {
+#     #     'ENGINE': 'django.db.backends.postgresql',
+#     #     'NAME': config('PGNAME'),
+#     #     'USER':config('PGUSER'),
+#     #     'PASSWORD': config('PGPASSWORD'),
+#     #     'HOST': config('PGHOST', default='localhost'),
+#     #     'PORT': config('PGPORT')
+#     # }
+# }
 
 SITE_ID = 1
 AUTH_USER_MODEL = 'register.CustomUser'

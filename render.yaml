@@ -10,7 +10,7 @@ services:
           name: commerce
           property: connectionString
       - key: SECRET_KEY
-        value: your-secure-secret-key
+        value: django-insecure-g^w5$oj^unmw^p*(&jpb5klc1a7zn-#baxyj(a0+dqd=0+gy2*
       - key: DEBUG
         value: "False"
       - key: ALLOWED_HOSTS
@@ -23,3 +23,5 @@ services:
         value: "995826528841416"
       - key: CLOUD_SECRET_KEY
         value: "NbfvCGcLJDWjD9w5cNU3jsIK6vs"
+      - key: CLOUDINARY_URL
+        value: "cloudinary://995826528841416:NbfvCGcLJDWjD9w5cNU3jsIK6vs@olaneat"

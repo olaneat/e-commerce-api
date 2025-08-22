@@ -163,11 +163,16 @@ SIMPLE_JWT = {
     "AUTH_HEADER_TYPES": ("Bearer",),
    
 }
-cloudinary.config(
-    cloud_name=config('CLOUD_NAME'),
-    api_key=config('CLOUD_API_KEY'),
-    api_secret=config('CLOUD_SECRET_KEY')
-)
+
+# cloudinary_url = config('CLOUDINARY_URL')
+# if cloudinary_url:
+#     cloudinary.config(cloudinary_url=cloudinary_url)
+# else:
+#     cloudinary.config(
+#         cloud_name=config('CLOUD_NAME'),
+#         api_key=config('CLOUD_API_KEY'),
+#         api_secret=config('CLOUD_SECRET_KEY')
+#     )
 
 MEDIA_URL = '/media/'  # or any prefix you choose
 DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'

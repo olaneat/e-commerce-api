@@ -80,16 +80,6 @@ WSGI_APPLICATION = 'commerce.wsgi.application'
 #     )
 # }
 
-db_url = config('DB_URL')  # Use Render's provided variable
-if not db_url:
-    db_url = config('DB_URL')  # Fallback for local testing
-if db_url:
-    config = dj_database_url.parse(db_url)
-    config['CONN_MAX_AGE'] = 600  # Set conn_max_age
-    DATABASES['default'] = config
-else:
-    print("Warning: Neither DATABASE_URL nor DB_URL set, using default SQLite database.")
-
 DATABASES = {
     # "default": dj_database_url.parse(os.environ.get('DB_URL'))
     'default': {
@@ -103,6 +93,15 @@ DATABASES = {
 }
 
 
+db_url = config('DB_URL')  # Use Render's provided variable
+if not db_url:
+    db_url = config('DB_URL')  # Fallback for local testing
+if db_url:
+    config = dj_database_url.parse(db_url)
+    config['CONN_MAX_AGE'] = 600  # Set conn_max_age
+    DATABASES['default'] = config
+else:
+    print("Warning: Neither DATABASE_URL nor DB_URL set, using default SQLite database.")
 
 SITE_ID = 1
 AUTH_USER_MODEL = 'register.CustomUser'

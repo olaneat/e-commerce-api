@@ -1,4 +1,5 @@
-python3.11 -m venv venv
-source venv/bin/activate
-pip install -r requirements.txt
-gunicorn commerce.wsgi:application --bind 0.0.0.0:8000
+#!/usr/bin/env bash
+apt-get update -qq && apt-get install -y libpq-dev python3-dev gcc g++ libssl-dev
+pip install --no-cache-dir --force-reinstall --upgrade pip
+pip install --no-cache-dir -r requirements.txt
+python manage.py collectstatic --noinput

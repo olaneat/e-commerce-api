@@ -165,7 +165,6 @@ SIMPLE_JWT = {
 }
 # print(f"DEBUG: config type={type(config)}, CLOUDINARY_URL={config('CLOUDINARY_URL')}")
 cloudinary_url = os.environ.get('CLOUDINARY_URL')
-print(cloudinary_url, "url")
 if cloudinary_url:
     cloudinary.config(cloudinary_url=cloudinary_url)
 else:
@@ -181,7 +180,11 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles_build', 'static')
 MEDIA_URLS ='/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
-
+try:
+    import psycopg2
+    print("DEBUG: psycopg2 imported successfully, version:", psycopg2.__version__)
+except ImportError as e:
+    print(f"DEBUG: Failed to import psycopg2: {e}")
 
 '''
     if settings.DEBUG:

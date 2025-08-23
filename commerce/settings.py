@@ -14,7 +14,7 @@ SECRET_KEY = config('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['e-mrkt-api.onrender.com', 'localhost', ]
+ALLOWED_HOSTS = ['e-mrkt-api.onrender.com', 'localhost', '127.0.0.1']
 CORS_ALLOWED_ORIGINS = ["http://localhost:4200"]
 
 

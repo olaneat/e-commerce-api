@@ -3,20 +3,20 @@ services:
     name: commerce
     env: python
     buildCommand: "cd /opt/render/project/src && ./build.sh"
-    startCommand: "cd /opt/render/project/src && gunicorn commerce.wsgi:application --bind 0.0.0.0:$PORT --timeout 120"
+    startCommand: "cd /opt/render/project/src && gunicorn commerce.wsgi:application --bind 0.0.0.0:$PORT --timeout 300 --workers 1"  # Use $PORT
     envVars:
       - key: DATABASE_URL
         fromDatabase:
           name: commerce
           property: connectionString
       - key: SECRET_KEY
-        value: django-insecure-g^w5$oj^unmw^p*(&jpb5klc1a7zn-#baxyj(a0+dqd=0+gy2*
+        value: your-secure-secret-key
       - key: DEBUG
         value: "False"
       - key: ALLOWED_HOSTS
         value: "e-mrkt-api.onrender.com"
       - key: PYTHON_VERSION
-        value: "3.13"
+        value: "3.11"
       - key: CLOUD_NAME
         value: "olaneat"
       - key: CLOUD_API_KEY

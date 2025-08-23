@@ -7,14 +7,14 @@ from django.utils.encoding import smart_str, force_str, DjangoUnicodeDecodeError
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
 from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
 from django.contrib.auth import authenticate
-from rest_framework_simplejwt.settings import api_settings
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
+from rest_framework_simplejwt.settings import api_settings as jwt_settings
 from .models import CustomUser
 from userProfile.serializers import UserProfileSerializer
+
 #from job.serializers import JobSerializer
 #from wallet.serializers import WalletSerializer 
 
-JWT_PAYLOAD_HANDLER = api_settings.JWT_PAYLOAD_HANDLER
-JWT_ENCODE_HANDLER = api_settings.JWT_ENCODE_HANDLER
 
 class LoginSerializer(serializers.Serializer):
     email = serializers.EmailField(write_only=True)
@@ -32,8 +32,8 @@ class LoginSerializer(serializers.Serializer):
             )
 
         try:
-            payload = JWT_PAYLOAD_HANDLER(user)
-            jwt_token = JWT_ENCODE_HANDLER(payload)
+            payload = jwt_settings.JWT_PAYLOAD_HANDLER(user)
+            jwt_token = jwt_settings.JWT_ENCODE_HANDLER(payload)
             update_last_login(None, user)
         except user.DoesNotExist:
             raise serializers.ValidationError(

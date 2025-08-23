@@ -2,8 +2,8 @@ services:
   - type: web
     name: commerce
     env: python
-    buildCommand: "./build.sh"
-    startCommand: "gunicorn commerce.wsgi:application --bind 0.0.0.0:$PORT"
+    buildCommand: "cd /opt/render/project/src && ./build.sh"
+    startCommand: "cd /opt/render/project/src && gunicorn commerce.wsgi:application --bind 0.0.0.0:$PORT"
     envVars:
       - key: DATABASE_URL
         fromDatabase:

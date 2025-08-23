@@ -7,7 +7,7 @@ from django.utils.encoding import smart_str, force_str, DjangoUnicodeDecodeError
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
 from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
 from django.contrib.auth import authenticate
-from rest_framework_jwt.settings import api_settings
+from rest_framework_simplejwt.settings import api_settings
 from .models import CustomUser
 from userProfile.serializers import UserProfileSerializer
 #from job.serializers import JobSerializer

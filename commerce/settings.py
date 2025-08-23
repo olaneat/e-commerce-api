@@ -14,8 +14,8 @@ SECRET_KEY = config('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['localhost', 'e-marj.fly.dev']
-CORS_ALLOWED_ORIGINS = ["http://localhost:4200", "https://e-mrkt-api.onrender.com"]
+ALLOWED_HOSTS = ['e-mrkt-api.onrender.com', 'localhost', ]
+CORS_ALLOWED_ORIGINS = ["http://localhost:4200"]
 
 
 # Application definition
@@ -110,7 +110,6 @@ AUTHENTICATION_BACKENDS = ('django.contrib.auth.backends.ModelBackend',)
 REST_FRAMEWORK = {
    'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_simplejwt.authentication.JWTAuthentication',
-
     ),
     'DEFAULT_PERMISSION_CLASSES': (
         'rest_framework.permissions.IsAuthenticated',

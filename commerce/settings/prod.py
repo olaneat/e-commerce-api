@@ -2,8 +2,8 @@
 from .base import *
 
 DEBUG = False
-ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', 'e-mrkt-api.onrender.com').split(',')
-
+ALLOWED_HOSTS = ['e-mrkt-api.onrender.com', 'localhost', '127.0.0.1']
+CORS_ALLOWED_ORIGINS = ["http://localhost:4200"]
 # Use Render's database
 # DATABASES = {
 #     'default': {
@@ -15,6 +15,7 @@ ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', 'e-mrkt-api.onrender.com').split
 #         'PORT': os.environ.get('DB_PORT', '5432'),
 #     }
 # }
+
 
 db_url = config('DB_URL')  # Use Render's provided variable
 if not db_url:

@@ -41,6 +41,7 @@ class UpdateProfile(generics.UpdateAPIView):
 class RetrieveProfile(generics.RetrieveAPIView):
     lookup_field = 'user_id'
     permission_classes = [permissions.IsAuthenticated]
+    serializer_class = UserProfileSerializer
 
     def get(self, request, user_id=None):
         queryset = UserProfileModel.objects.get(user_id=user_id)

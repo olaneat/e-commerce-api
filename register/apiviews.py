@@ -52,12 +52,13 @@ class RegistrationAPIView(APIView):
         return Response(response)
 
 
-class LoginAPIView(APIView):
+class LoginAPIView(RetrieveAPIView):
     permission_classes = [permissions.AllowAny]
+    serializer_class = LoginSerializer
 
     def post(self, request):
         data = request.data
-        serializer = LoginSerializer(data=request.data)
+        serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
         email = data.get('email', None)
         password = data.get('password', None)
@@ -89,9 +90,9 @@ class LoginAPIView(APIView):
 
 
 class changePasswordAPIView(generics.UpdateAPIView):
-    serializer_class = CreatePasswordSerializer
     models = CustomUser
     permission_classes = (permissions.IsAuthenticated,)
+    serializer_class = CreatePasswordSerializer
 
     def get_obj(self, queury_set=None):
         obj = self.request.user
@@ -118,7 +119,7 @@ class changePasswordAPIView(generics.UpdateAPIView):
 
 
 class RequestPasswordResetAPIView(generics.GenericAPIView):
-    serializers_class = RequestNewPasswordSerializer
+    serializer_class = RequestNewPasswordSerializer
 
     def post(self, request):
         serializer = self.serializers_class(data=request.data)
@@ -152,7 +153,7 @@ class RequestPasswordResetAPIView(generics.GenericAPIView):
 
 
 class PasswordTokenAPIView(generics.GenericAPIView):
-    def get(self, request, uidb64, token):
+    def get_queryset(self, request, uidb64, token):
         try:
             id = smart_str(urlsafe_base64_decode(uidb64))
             user = CustomUser.objects.get(id=id)
@@ -171,7 +172,7 @@ class PasswordTokenAPIView(generics.GenericAPIView):
 
 
 class CreatePasswordAPI(generics.GenericAPIView):
-    serializers_class = CreatePasswordSerializer
+    serializer_class = CreatePasswordSerializer
 
     def patch(self, request):
         serializer = self.serializers_class(data=request.data)
@@ -192,8 +193,14 @@ class DisplayUsers(generics.ListAPIView):
 
 
 class DeleteUser(generics.DestroyAPIView):
-    serializer_class = RegistrationSerializer
-    permission_class = [permissions.IsAuthenticated]
+    permission_classes = [permissions.IsAdminUser]
+    queryset = CustomUser.objects.all()  # Define a base queryset
+
+    def get_object(self):
+        # Override to get the object based on a lookup (e.g., user ID from URL)
+        queryset = self.get_queryset()
+        return queryset.get(id=self.kwargs['pk'])  # Assume URL has <pk>
 
     def get_queryset(self):
-        return CustomUser.objects.get(id=self.user.id)
+        # Optional: Customize queryset if needed
+        return self.queryset

@@ -3,7 +3,7 @@ services:
     name: commerce
     env: python
     buildCommand: "cd /opt/render/project/src && ./build.sh"
-    startCommand: "cd /opt/render/project/src && gunicorn commerce.wsgi:application --bind 0.0.0.0:$PORT --timeout 300 --workers 1"  # Use $PORT
+    startCommand: "cd /opt/render/project/src && gunicorn commerce.wsgi:application --bind 0.0.0.0:$PORT --timeout 300 --workers 1"
     envVars:
       - key: DATABASE_URL
         fromDatabase:
@@ -26,8 +26,8 @@ services:
       - key: CLOUDINARY_URL
         value: "cloudinary://995826528841416:NbfvCGcLJDWjD9w5cNU3jsIK6vs@olaneat"
       - key: SUPERUSER_USERNAME
-        value: olaneat
+        value: neat
       - key: SUPERUSER_EMAIL
-        value: ola@abc.com
+        value: admin@abc.com
       - key: SUPERUSER_PASSWORD
         value: password

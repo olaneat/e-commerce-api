@@ -31,3 +31,5 @@ services:
         value: admin@abc.com
       - key: SUPERUSER_PASSWORD
         value: password
+      - key: SUPERUSER_ROLE
+        value: admin

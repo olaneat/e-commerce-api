@@ -52,13 +52,12 @@ class RegistrationAPIView(APIView):
         return Response(response)
 
 
-class LoginAPIView(RetrieveAPIView):
+class LoginAPIView(APIView):
     permission_classes = [permissions.AllowAny]
-    serializer_class = LoginSerializer
 
     def post(self, request):
         data = request.data
-        serializer = self.serializer_class(data=request.data)
+        serializer = LoginSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         email = data.get('email', None)
         password = data.get('password', None)

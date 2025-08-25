@@ -20,7 +20,7 @@ from rest_framework import status
 class CreateProductAPIView(generics.CreateAPIView):
     lookup_field = 'id'
     serializer_class = CreateProductSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.IsAdminUser]
     queryset = ProductModel.objects.all()
 
 class ListProductAPIView(generics.ListAPIView):
@@ -41,27 +41,27 @@ class ProductDetailAPIView(generics.RetrieveAPIView):
 class UpdateProductAPIView(generics.UpdateAPIView):
     lookup_field = 'id'
     serializer_class = CreateProductSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.IsAdminUser]
     queryset = ProductModel.objects.all()
     
 class DeleteProductAPIView(generics.DestroyAPIView):
     lookup_field = 'id'
     serializer_class = ProductDetailSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.IsAdminUser]
     queryset = ProductModel.objects.all()
     
 
 class CreateCatogoeryAPIView(generics.CreateAPIView):
     lookup_field = 'id'
     serializer_class = CreateCategorySerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.IsAdminUser]
     queryset = CategoryModel.objects.all()
 
 
 class UpdateCategoryAPIView(generics.UpdateAPIView):
     lookup_field = 'id'
     serializer_class = CategorySerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.IsAdminUser]
     queryset = CategoryModel.objects.all()
     
 
@@ -80,21 +80,21 @@ class CategoryDetailAPIView(generics.RetrieveAPIView):
 class DeleteCategoryAPIView(generics.DestroyAPIView):
     lookup_field = 'id'
     serializer_class = CategorySerializer
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    permission_classes = [permissions.IsAdminUser]
     queryset = CategoryModel.objects.all()
 
 
 class CreateManufacturerAPIView(generics.CreateAPIView):
     lookup_field = 'id'
     serializer_class = CreateManufacturerSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.IsAdminUser]
     queryset = ManufacturerModel.objects.all()
 
 
 class UpdateManufacturerAPIView(generics.UpdateAPIView):
     lookup_field = 'id'
     serializer_class = CreateManufacturerSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.IsAdminUser]
     queryset = ManufacturerModel.objects.all()
     
 
@@ -119,7 +119,7 @@ class OtherProductsAPIView(APIView):
 class DeleteManufacturerAPIView(generics.DestroyAPIView):
     lookup_field = 'id'
     serializer_class = ListManufactuererSerializer
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    permission_classes = [permissions.IsAdminUser]
     queryset = ManufacturerModel.objects.all()
 
 class ManufacturerDetailAPIView(generics.RetrieveAPIView):

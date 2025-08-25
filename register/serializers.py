@@ -8,13 +8,10 @@ from django.contrib.auth.tokens import PasswordResetTokenGenerator
 from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
 from django.contrib.auth import authenticate
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
+from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.settings import api_settings as jwt_settings
 from .models import CustomUser
 from userProfile.serializers import UserProfileSerializer
-
-#from job.serializers import JobSerializer
-#from wallet.serializers import WalletSerializer 
-
 
 class LoginSerializer(serializers.Serializer):
     email = serializers.EmailField(write_only=True)
@@ -31,38 +28,11 @@ class LoginSerializer(serializers.Serializer):
                 ' email & password not found.'
             )
 
-        try:
-            payload = jwt_settings.JWT_PAYLOAD_HANDLER(user)
-            jwt_token = jwt_settings.JWT_ENCODE_HANDLER(payload)
-            update_last_login(None, user)
-        except user.DoesNotExist:
-            raise serializers.ValidationError(
-                'user found'
-            )
+        refresh = RefreshToken.for_user(user)
+        data['refresh'] = str(refresh)
+        data['access'] = str(refresh.access_token)
 
-        return {
-            'email': user.email,
-            'id': user.id,
-            'token': jwt_token,
-        }
-        '''if password is None:
-            raise serializers.ValidationError(
-                'A password is required to log in.'
-            )
-            if user is None:
-            raise serializers.ValidationError(
-                'A user with this email and password was not found.'
-            )
-
-        if not user.is_active:
-            raise serializers.ValidationError(
-                'This user has been deactivated.'
-            )
-
-        return {
-            'token': user.token,
-        }
-        '''
+        return data
 
 
 class RegistrationSerializer(serializers.ModelSerializer):

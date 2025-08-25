@@ -23,7 +23,7 @@ class CustomManager(BaseUserManager):
 
         email = self.normalize_email(email)
         #user = self.model(email=email, username=username)
-        user = self.model(email=email, username=username, **extra_fields)
+        user = self.model(email=email, username=username)
         user.set_password(password)
         user.save(using=self._db)
         return user
@@ -33,20 +33,15 @@ class CustomManager(BaseUserManager):
         extra_fields.setdefault('is_superuser', False)
         return self._create_user(email, username, password, **extra_fields)
 
-    def create_superuser(self, email, username, password, **extra_fields):
-        """
-        Create a superuser with the given email, username, and password.
-        """
-        if not password:
-            raise TypeError(_('Password must be set'))
-        extra_fields.setdefault('is_staff', True)
-        extra_fields.setdefault('is_superuser', True)
-        extra_fields.setdefault('role', 'admin')  # Default role for superuser
-        if extra_fields.get('is_staff') is not True:
-            raise ValueError(_('Superuser must have is_staff=True'))
-        if extra_fields.get('is_superuser') is not True:
-            raise ValueError(_('Superuser must have is_superuser=True'))
-        return self._create_user(email, username, password, **extra_fields)
+    def create_superuser(self, username, email, password, **extra_fields):
+        if password is None:
+            raise TypeError('password field is required')
+
+        user = self._create_user(username, email, password)
+        user.is_staff = True
+        user.is_superuser = True
+        user.save()
+        return user
 
         '''extra_fields.setdefault('is_staff', True)
         extra_fields.setdefault('is_superuser', True)
@@ -70,23 +65,22 @@ class CustomUser(AbstractUser):
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['username']
 
-    objects = CustomManager()
-
     def __str__(self):
         return self.username
 
-    @property
-    def token(self):
-        return self._generate_jwt_token()
+    # @property
+    # def token(self):
+    #     return self._generate_jwt_token()
 
-    def _generate_jwt_token(self):
-        dt = datetime.now() + timedelta(minutes=180)
-        token = jwt.encode({
-            'id': self.pk,
-            'exp': int(dt.strftime('%s'))
-        }, settings.SECRET_KEY, algorithm='HS256')
-        return token.decode('utf-8')
+    # def _generate_jwt_token(self):
+    #     dt = datetime.now() + timedelta(minutes=180)
+    #     token = jwt.encode({
+    #         'id': self.pk,
+    #         'exp': int(dt.strftime('%s'))
+    #     }, settings.SECRET_KEY, algorithm='HS256')
+    #     return token.decode('utf-8')
 
     class Meta:
         ordering = ('email',)
 
+    objects = CustomManager()

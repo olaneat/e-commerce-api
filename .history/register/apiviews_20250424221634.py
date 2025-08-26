@@ -33,6 +33,8 @@ class RegistrationAPIView(APIView):
     permission_classes = [permissions.AllowAny]
     serializer_class = RegistrationSerializer
 
+    
+
     def post(self, request, format=None):
         serializer = RegistrationSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -72,18 +74,11 @@ class LoginAPIView(APIView):
                     'refresh_token': str(refresh),
                     'access_token': str(refresh.access_token),
                     #'token':  serializer.data['token'],
-                    "user": {
-                            'firstName':self.request.user.user_profile.first_name,
-                            'lastName': self.request.user.user_profile.last_name,
-                            'id': self.request.user.id,
-                            'email': self.request.user.email,
-                            'username': self.request.user.username,
-                        }
-                    # 'first_name': self.request.user.user_profile.first_name,
-                    # 'last_name': self.request.user.user_profile.last_name,
-                    # 'id': self.request.user.id,
-                    # 'email': self.request.user.email,
-                    # 'is_admin': self.request.user.is_superuser,
+                    'first_name': self.request.user.user_profile.first_name,
+                    'last_name': self.request.user.user_profile.last_name,
+                    'id': self.request.user.id,
+                    'email': self.request.user.email,
+                    'is_admin': self.request.user.is_superuser,
                 }
                 status_code = status.HTTP_200_OK
                 #print(data)
@@ -95,9 +90,9 @@ class LoginAPIView(APIView):
 
 
 class changePasswordAPIView(generics.UpdateAPIView):
+    serializer_class = CreatePasswordSerializer
     models = CustomUser
     permission_classes = (permissions.IsAuthenticated,)
-    serializer_class = CreatePasswordSerializer
 
     def get_obj(self, queury_set=None):
         obj = self.request.user
@@ -116,6 +111,7 @@ class changePasswordAPIView(generics.UpdateAPIView):
                 'message': 'Password Successfully Changed',
                 'code': status.HTTP_201_OK,
                 'status': 'Success', 
+                'data': [],
             }
 
             return Response(response)
@@ -124,7 +120,7 @@ class changePasswordAPIView(generics.UpdateAPIView):
 
 
 class RequestPasswordResetAPIView(generics.GenericAPIView):
-    serializer_class = RequestNewPasswordSerializer
+    serializers_class = RequestNewPasswordSerializer
 
     def post(self, request):
         serializer = self.serializers_class(data=request.data)
@@ -158,7 +154,7 @@ class RequestPasswordResetAPIView(generics.GenericAPIView):
 
 
 class PasswordTokenAPIView(generics.GenericAPIView):
-    def get_queryset(self, request, uidb64, token):
+    def get(self, request, uidb64, token):
         try:
             id = smart_str(urlsafe_base64_decode(uidb64))
             user = CustomUser.objects.get(id=id)
@@ -177,7 +173,7 @@ class PasswordTokenAPIView(generics.GenericAPIView):
 
 
 class CreatePasswordAPI(generics.GenericAPIView):
-    serializer_class = CreatePasswordSerializer
+    serializers_class = CreatePasswordSerializer
 
     def patch(self, request):
         serializer = self.serializers_class(data=request.data)
@@ -198,14 +194,8 @@ class DisplayUsers(generics.ListAPIView):
 
 
 class DeleteUser(generics.DestroyAPIView):
-    permission_classes = [permissions.IsAdminUser]
-    queryset = CustomUser.objects.all()  # Define a base queryset
-
-    def get_object(self):
-        # Override to get the object based on a lookup (e.g., user ID from URL)
-        queryset = self.get_queryset()
-        return queryset.get(id=self.kwargs['pk'])  # Assume URL has <pk>
+    serializer_class = RegistrationSerializer
+    permission_class = [permissions.IsAuthenticated]
 
     def get_queryset(self):
-        # Optional: Customize queryset if needed
-        return self.queryset
+        return CustomUser.objects.get(id=self.user.id)

@@ -135,7 +135,6 @@ class CreateManufacturerSerializer(serializers.ModelSerializer):
 
 
     def create(self, validated_data):
-        print(validated_data)
         product_data = validated_data.pop('product_manufacturer')
         manufacturer = ManufacturerModel.objects.create(**validated_data)
         for product in product_data:

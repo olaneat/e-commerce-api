@@ -8,6 +8,7 @@ from rest_framework.views import APIView
 from rest_framework.generics import RetrieveAPIView
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth import authenticate, login
+from rest_framework.exceptions import ValidationError
 from .serializers import (
     RegistrationSerializer, CreatePasswordSerializer, 
     ChangePasswordSerializer, LoginSerializer, 
@@ -29,28 +30,42 @@ class UserDetail(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = RegistrationSerializer
 
 
-class RegistrationAPIView(APIView):
+class RegistrationAPIView(generics.GenericAPIView):
     permission_classes = [permissions.AllowAny]
     serializer_class = RegistrationSerializer
 
     def post(self, request, format=None):
         serializer = RegistrationSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        serializer.save()
-        data = request.data
-        email = data.get('email')
-        password = data.get('password')
-        response = {
-            'success': True,
-            'message': "signup successful, proceed to login",
-            'status_code': status.HTTP_201_CREATED,
-            'username': serializer.data.get('username', None),
-            'email': serializer.data.get('email', None),
-        }
-        return Response(response)
+        try:
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
+            data = request.data
+            email = data.get('email')
+            password = data.get('password')
+            response = {
+                'success': True,
+                'message': "signup successful, proceed to login",
+                'status_code': status.HTTP_201_CREATED,
+                'username': serializer.data.get('username', None),
+                'email': serializer.data.get('email', None),
+            }
+            return Response(response)
+        except ValidationError as e:
+            error_messages = []
+            for field, errors in e.detail.items():
+                if isinstance(errors, list):
+                    error_messages.extend(errors)
+                else:
+                    error_messages.append(str(errors))
+            message = '; '.join(error_messages) if error_messages else 'Validation error'
+            return Response({
+                'success': False,
+                'message': message,
+                'status_code': status.HTTP_400_BAD_REQUEST,
+                'errors': e.detail
+            }, status=status.HTTP_400_BAD_REQUEST)
 
-
-class LoginAPIView(APIView):
+class LoginAPIView(generics.GenericAPIView):
     permission_classes = [permissions.AllowAny]
     serializer_class = LoginSerializer
 

@@ -23,6 +23,7 @@ CORS_ALLOWED_ORIGINS = [ "http://localhost:5173"]
 
 # Application definition
 INSTALLED_APPS = [
+    'django.contrib.sites',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -40,6 +41,7 @@ INSTALLED_APPS = [
     'register',
     'userProfile',
     'products',
+    'orders'
 ]
 
 

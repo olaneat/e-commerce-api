@@ -36,7 +36,6 @@ class InitiatePaymentView(APIView):
             # default= 
             payment_url = 'https://api.paystack.co/transaction/initialize'
             amount_in_kobo = int(order.total_amount * 100) 
-            print(serializer.data['total_cost'], 'data')
             payload = {
                 'reference': order.reference,
                 'email': request.user.email,
@@ -53,7 +52,6 @@ class InitiatePaymentView(APIView):
                     json=payload,
                     headers=headers
                 )
-                print("payload created", payload)
                 payment_response.raise_for_status()
                 paystack_data = payment_response.json()
                 if paystack_data.get('status'):

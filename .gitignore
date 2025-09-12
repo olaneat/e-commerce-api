@@ -5,4 +5,5 @@ fly.toml
 */migrations
 __pycache__
 .DS_Store
-*/history
+/history
+/staticfiles_build/

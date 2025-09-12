@@ -76,7 +76,7 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'commerce.wsgi.application'
-STATIC_URL = 'static/'
+
 
 # Database
 DATABASES = {
@@ -108,6 +108,7 @@ USE_TZ = True
 # Static files
 MEDIA_URL = '/media/'  # or any prefix you choose
 DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles_build', 'static')
 MEDIA_URLS ='/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
@@ -164,3 +165,4 @@ SIMPLE_JWT = {
     'TOKEN_OBTAIN_SERIALIZER': 'rest_framework_simplejwt.serializers.TokenObtainPairSerializer',
     'TOKEN_REFRESH_SERIALIZER': 'rest_framework_simplejwt.serializers.TokenRefreshSerializer',
 }
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'

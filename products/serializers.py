@@ -87,8 +87,6 @@ class ListProductSerializer(serializers.ModelSerializer):
     class Meta:
         model = ProductModel
         fields = ['name', 'id', 'category', 'price', 'img']
-        print(fields)
-
     
 
 class CreateCategorySerializer(serializers.ModelSerializer):

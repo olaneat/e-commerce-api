@@ -1,7 +1,7 @@
 # commerce/settings/production.py
 from .base import *
 
-DEBUG = False
+DEBUG = True
 ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'e-mrkt-api.onrender.com']
 # Use Render's database
 # DATABASES = {

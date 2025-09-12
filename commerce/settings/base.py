@@ -19,7 +19,7 @@ DEBUG = False  # Default to False, override in environment-specific files
 # ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', 'localhost').split(',')
 # CORS_ALLOWED_ORIGINS = ["http://localhost:4200"]
 ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', 'localhost,127.0.0.1').split(',')
-CORS_ALLOWED_ORIGINS = [ "http://localhost:5173"]
+CORS_ALLOWED_ORIGINS = [ "http://localhost:5173", 'https://neatstorez.netlify.app']
 
 # Application definition
 INSTALLED_APPS = [

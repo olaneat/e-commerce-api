@@ -2,7 +2,7 @@
 *pyc
 dockerfile
 fly.toml
-*/migrations
+*/migrations/*
 __pycache__
 .DS_Store
 /history

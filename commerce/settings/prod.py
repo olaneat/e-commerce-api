@@ -2,7 +2,7 @@
 from .base import *
 
 DEBUG = True
-ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'e-mrkt-api.onrender.com']
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'e-mrkt-api.onrender.com', 'https://neatstorez.netlify.app/']
 # Use Render's database
 # DATABASES = {
 #     'default': {

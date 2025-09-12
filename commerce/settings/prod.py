@@ -16,12 +16,10 @@ ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'e-mrkt-api.onrender.com']
 # }
 
 db_url = config('DB_URL')  # Use Render's provided variable
-print("Database URL:", db_url)  # Debugging line
 if not db_url:
     db_url = config('DB_URL')  # Fallback for local testing
 if db_url:
     config = dj_database_url.parse(db_url)
-    print("Database configuration:", config)  # Debugging line
     config['CONN_MAX_AGE'] = 600  # Set conn_max_age
     DATABASES['default'] = config
 # Static and media files for Render

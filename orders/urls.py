@@ -1,10 +1,11 @@
 from django.urls import path
-from .apiviews import CreateOrderAPIView
+from .apiviews import InitiatePaymentView, ListOrdersView, DeleteOrderView, VerifyPaymentAPIView
 app_name = "orders"
 urlpatterns = [
-    path('create', CreateOrderAPIView.as_view(), name='order-create'),
-    # path('list/', OrderListView.as_view(), name='order-list'),
-    # path('detail/<uuid:pk>/', OrderDetailView.as_view(), name='order-detail'),
+    path('initiate-payment', InitiatePaymentView.as_view(), name='order-create'),
+    path('list', ListOrdersView.as_view(), name='order-list'),
+    path('verify-payment/<reference>', VerifyPaymentAPIView.as_view(), name='verify-payment'),
+    # path('verify-payment', verify_payment, name='verify-payment'),
     # path('update/<uuid:pk>/', OrderUpdateView.as_view(), name='order-update'),
-    # path('delete/<uuid:pk>/', OrderDeleteView.as_view(), name='order-delete'),
+    path('delete/<pk>/', DeleteOrderView.as_view(), name='order-delete'),
 ]

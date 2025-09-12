@@ -7,7 +7,6 @@ from decouple import config
 import cloudinary
 import dj_database_url
 
-
 load_dotenv()
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -185,6 +184,8 @@ DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles_build', 'static')
 MEDIA_URLS ='/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+PAYSTACK_PK = os.environ.get('PAYSTACK_PK')
+PAYSTACK_SK = os.environ.get('PAYSTACK_SK')
 
 try:
     import psycopg2

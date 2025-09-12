@@ -23,6 +23,7 @@ CORS_ALLOWED_ORIGINS = [ "http://localhost:5173"]
 
 # Application definition
 INSTALLED_APPS = [
+    'django.contrib.sites',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -40,6 +41,7 @@ INSTALLED_APPS = [
     'register',
     'userProfile',
     'products',
+    'orders'
 ]
 
 
@@ -149,4 +151,16 @@ SWAGGER_SETTINGS = {
         }
     },
     'USE_SESSION_AUTH': False,  # Disable session auth to avoid conflicts
+}
+
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(days=1),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
+    'ROTATE_REFRESH_TOKENS': False,
+    'BLACKLIST_AFTER_ROTATION': True,
+    'UPDATE_LAST_LOGIN': False,
+
+    # Optional: Customize token generation if needed
+    'TOKEN_OBTAIN_SERIALIZER': 'rest_framework_simplejwt.serializers.TokenObtainPairSerializer',
+    'TOKEN_REFRESH_SERIALIZER': 'rest_framework_simplejwt.serializers.TokenRefreshSerializer',
 }

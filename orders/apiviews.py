@@ -40,7 +40,7 @@ class InitiatePaymentView(APIView):
                 'reference': order.reference,
                 'email': request.user.email,
                 'amount': amount_in_kobo,
-                "callback_url": "https://neatstorez.netlify.app/verify-payment"
+                "callback_url": "https://emrkt.vercel.app/verify-payment"
             }
             headers = {
                 'Authorization': f'Bearer {config("PAYSTACK_SK")}',

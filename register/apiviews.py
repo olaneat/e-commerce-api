@@ -116,20 +116,25 @@ class changePasswordAPIView(generics.UpdateAPIView):
 
     def get_obj(self, queury_set=None):
         obj = self.request.user
-        return obj
 
-    def update(self, request, arg, **kwargs):
+    def update(self, request, *arg, **kwargs):
         self.object = self.get_obj()
         serializer = self.get_serializer(data=request.data)
 
         if serializer.is_valid():
+            old_password = serializer.data.get('old_password')
+            new_password = serializer.data.get('new_password')
+
             if not self.object.check_password(serializer.data.get('old_password')):
-                return Response({"old Password": ["Invalid Password"]}, status=status.HTTP_404_BAD_REQUEST)
-            self.object.set_password(self.serializer.data.get("new_password"))
+                return Response(
+                    {"old_password": ["Invalid password"]},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+            self.object.set_password(new_password)
             self.object.save()
             response = {
                 'message': 'Password Successfully Changed',
-                'code': status.HTTP_201_OK,
+                'code': status.HTTP_200_OK,
                 'status': 'Success', 
             }
 
@@ -200,10 +205,47 @@ class CreatePasswordAPI(generics.GenericAPIView):
         return Response({'success': True, 'message': 'Password changed Successfully'}, status=status.HTTP_200_OK)
 
 
+# class ChangePasswordAPI(generics.UpdateAPIView):
+#     serializer_class = ChangePasswordSerializer
+#     queryset = CustomUser.objects.all()
+#     permissions_classes = [permissions.IsAuthenticated]
+
+
 class ChangePasswordAPI(generics.UpdateAPIView):
+    models = CustomUser
+    permission_classes = (permissions.IsAuthenticated,)
     serializer_class = ChangePasswordSerializer
-    queryset = CustomUser.objects.all()
-    permissions_classes = [permissions.IsAuthenticated]
+
+    def get_obj(self):
+        return self.request.user
+
+    def perform_update(self, serializer):
+        user = self.get_obj()
+        user.set_password(serializer.validated_data['new_password'])
+        user.save()
+
+    def update(self, request, *arg, **kwargs):
+
+        serializer = self.get_serializer(data=request.data)
+        if serializer.is_valid():
+            self.perform_update(serializer)
+            response = {
+                'message': 'Password Successfully Changed',
+                'code': status.HTTP_200_OK,
+                'status': 'Success', 
+            }
+        
+            return Response(response)
+
+        return Response(
+            {
+                'message': 'Validation Error',
+                'code': status.HTTP_400_BAD_REQUEST,
+                'status': 'Error',
+                'errors': serializer.errors,
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
 
 
 class DisplayUsers(generics.ListAPIView):

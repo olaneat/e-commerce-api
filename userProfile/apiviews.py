@@ -5,7 +5,7 @@ from rest_framework import permissions
 from rest_framework import parsers
 from rest_framework import status
 from rest_framework.response import Response
-
+from django.shortcuts import get_object_or_404
 class CreateUserProfileAPIView(generics.CreateAPIView):
     queryset = UserProfileModel.objects.all()
     serializer_class = UserProfileSerializer
@@ -36,6 +36,34 @@ class UpdateProfile(generics.UpdateAPIView):
     serializer_class = UserProfileSerializer
     queryset = UserProfileModel.objects.all()
     permission_classes = [permissions.IsAuthenticated]
+
+    def update(self, request, *args, **kwargs):
+        """Custom update with structured response & error handling"""
+        try:
+            instance = get_object_or_404(UserProfileModel, user_id=kwargs.get(self.lookup_field))
+
+            serializer = self.get_serializer(instance, data=request.data, partial=True)
+            serializer.is_valid(raise_exception=True)
+            self.perform_update(serializer)
+
+            return Response({
+                "status": "success",
+                "message": "Profile updated successfully",
+                "data": serializer.data
+            }, status=status.HTTP_200_OK)
+
+        except Exception as e:
+            return Response({
+                "status": "error",
+                "message": str(e)
+            }, status=status.HTTP_400_BAD_REQUEST)    
+
+# class UpdateProfile(generics.UpdateAPIView):
+#     lookup_field = 'user_id'
+#     serializer_class = UserProfileSerializer
+#     queryset = UserProfileModel.objects.all()
+#     permission_classes = [permissions.IsAuthenticated]
+
 
 
 class RetrieveProfile(generics.RetrieveAPIView):

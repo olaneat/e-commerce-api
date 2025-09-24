@@ -19,7 +19,7 @@ DEBUG = False  # Default to False, override in environment-specific files
 # ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', 'localhost').split(',')
 CORS_ALLOWED_ORIGINS = ["http://localhost:5173"]
 # ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'https://emrkt.vercel.app/']
-# CORS_ALLOWED_ORIGINS = [ "http://localhost:5173", 'https://neatstorez.vercel.app']
+CORS_ALLOWED_ORIGINS = [ "http://localhost:5173", 'https://neatstorez.vercel.app']
 PAYSTACK_SK=os.environ.get('PAYSTACK_SK')
 # Application definition
 INSTALLED_APPS = [

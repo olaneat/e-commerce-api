@@ -3,6 +3,7 @@ from register.models import CustomUser
 from phonenumber_field.modelfields import PhoneNumberField
 from django.db.models.signals import post_save, pre_delete
 from django.dispatch import receiver
+from cloudinary.models import CloudinaryField
 
 # Create your models here.
 
@@ -17,6 +18,7 @@ class UserProfileModel(models.Model):
     state= models.CharField(max_length=255, blank=True, null=True)
     lga = models.CharField(max_length=255, blank=True, null=True)
     phone_number = models.CharField(blank=True, null=True)
+    profile_image = CloudinaryField('image', blank=True, null=True)
     
 @receiver(post_save, sender=CustomUser)
 def create_profile(sender, instance, created, **kwargs):

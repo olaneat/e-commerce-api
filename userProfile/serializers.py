@@ -10,14 +10,14 @@ class UserProfileSerializer(serializers.ModelSerializer):
 
     class Meta: 
         model = UserProfileModel
-        fields = ['username', 'uuid', 'phone_number', 'first_name', 'state', 'lga', 'address', 'last_name' ]
+        fields = ['username', 'uuid', 'phone_number', 'first_name', 'state', 'lga', 'address', 'last_name', 'profile_image']
 
-    def create(self, validated_data, instance=None):
-        if 'user' in validated_data:
-            user = validated_data.pop('user')
-        else:
-            user = CustomUser.objects.create(**validated_data)
-        profile = UserProfileModel.objects.update_or_create(
-            user=user, defaults=validated_data
-        )
-        return profile
+    # def create(self, validated_data, instance=None):
+    #     if 'user' in validated_data:
+    #         user = validated_data.pop('user')
+    #     else:
+    #         user = CustomUser.objects.create(**validated_data)
+    #     profile = UserProfileModel.objects.update_or_create(
+    #         user=user, defaults=validated_data
+    #     )
+    #     return profile

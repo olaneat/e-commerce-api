@@ -6,11 +6,14 @@ from rest_framework import parsers
 from rest_framework import status
 from rest_framework.response import Response
 from django.shortcuts import get_object_or_404
+from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
+
+
 class CreateUserProfileAPIView(generics.CreateAPIView):
     queryset = UserProfileModel.objects.all()
     serializer_class = UserProfileSerializer
     permission_classes = [permissions.IsAuthenticated]
-
+    
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(
             data = request.data, instance =request.user.user_profile
@@ -36,6 +39,8 @@ class UpdateProfile(generics.UpdateAPIView):
     serializer_class = UserProfileSerializer
     queryset = UserProfileModel.objects.all()
     permission_classes = [permissions.IsAuthenticated]
+    parser_classes = [MultiPartParser, FormParser, JSONParser]
+
 
     def update(self, request, *args, **kwargs):
         """Custom update with structured response & error handling"""

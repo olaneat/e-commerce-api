@@ -93,7 +93,7 @@ class CreateCategorySerializer(serializers.ModelSerializer):
     # product_category = serializers.StringRelatedField(many=True)
     class Meta:
         model = CategoryModel
-        fields = ['name', 'slug']
+        fields = ['name', 'slug', 'img']
 
     # def create(self, validated_data):
     #     print(validated_data)

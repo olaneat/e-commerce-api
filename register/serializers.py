@@ -68,21 +68,21 @@ class RegistrationSerializer(serializers.ModelSerializer):
 class RequestNewPasswordSerializer(serializers.Serializer):
     email = serializers.EmailField(required=True, max_length=250)
 
-    class Meta:
-        fields = ['email']
+    # class Meta:
+    #     fields = ['email']
 
-    def validate(self, attrs):
-        try:
-            email = attrs.get('email', '')
-            if CustomUser.objects.filter(email=email).exists(): 
-                user=CustomUser.objects.get(email=email)
-                uidb64 = urlsafe_base64_encode(user.id)
-                token = PasswordResetTokenGenerator.make_token(user)
-            return attrs
+    # def validate(self, attrs):
+    #     try:
+    #         email = attrs.get('email', '')
+    #         if CustomUser.objects.filter(email=email).exists(): 
+    #             user=CustomUser.objects.get(email=email)
+    #             uidb64 = urlsafe_base64_encode(user.id)
+    #             token = PasswordResetTokenGenerator.make_token(user)
+    #         return attrs
             
-        except expression as identifier:
-            pass
-        return super().validate(attrs)
+    #     except expression as identifier:
+    #         pass
+    #     return super().validate(attrs)
 
 class CreatePasswordSerializer(serializers.Serializer):
     password = serializers.CharField(

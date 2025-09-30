@@ -1,14 +1,19 @@
 
 from rest_framework.response import Response
-from django.contrib.auth import authenticate, login
+from django.contrib.auth import authenticate, login, get_user_model
 #from rest_framework.decorators import api_view
-from rest_framework import generics, viewsets, status
-from rest_framework import permissions 
+from rest_framework import generics, viewsets, status, permissions
 from rest_framework.views import APIView
 from rest_framework.generics import RetrieveAPIView
 from rest_framework_simplejwt.tokens import RefreshToken
-from django.contrib.auth import authenticate, login
 from rest_framework.exceptions import ValidationError
+from rest_framework.permissions import AllowAny
+import logging
+from django.contrib.sites.shortcuts import get_current_site
+from django.conf import settings
+from rest_framework.throttling import AnonRateThrottle
+from django.core.mail import send_mail
+
 from .serializers import (
     RegistrationSerializer, CreatePasswordSerializer, 
     ChangePasswordSerializer, LoginSerializer, 
@@ -143,38 +148,105 @@ class changePasswordAPIView(generics.UpdateAPIView):
         return Response(serializer.error, status=status.HTTP_400_BAD_REQUEST)
 
 
+
+
+CustomUser = get_user_model()
+logger = logging.getLogger(__name__)
 class RequestPasswordResetAPIView(generics.GenericAPIView):
+    throttle_classes = [AnonRateThrottle]
     serializer_class = RequestNewPasswordSerializer
+    permission_classes = [AllowAny]
+    def post(self, request, *args, **kwargs):
+        try:
+            serializer = self.get_serializer(data=request.data)
+            serializer.is_valid(raise_exception=True)  # Raises 400 if invalid
+            email = serializer.validated_data['email']
 
-    def post(self, request):
-        serializer = self.serializers_class(data=request.data)
-        email = request.data['email']
-        if CustomUser.objects.filter(email=email).exists():
-            user = CustomUser.objects.get(email=email)
+            try:
+                user = CustomUser.objects.get(email=email)
+            except CustomUser.DoesNotExist:
+                # Return generic response to avoid leaking user existence
+                return Response({
+                    'message': 'If an account exists with this email, a password reset link has been sent.'
+                }, status=status.HTTP_200_OK)
+
             uidb64 = urlsafe_base64_encode(smart_bytes(user.id))
-            token = PasswordResetTokenGenerator().make_token(user)
-            current_site = get_current_site(request=request).domain
-            dRelativeLink = reverse(
-                'register:password-reset-confirmed', kwargs={'uidb64': uidb64, 'token': token})
-            django_absUrl = 'http://' + current_site + dRelativeLink
-
-            local_host = 'http://localhost:4200/account/'
-            relativeLink = 'change-password/'+uidb64+' /'+token
-            absUrl = local_host+relativeLink
-            body = 'Hi  Click on the Link below to change your password \n' + absUrl
-            data = {
-                'body': body, "recipient": user.email,
-                "subject": "Password Reset Link"
+            token = PasswordResetTokenGenerator().make_token(user)     
+            current_site = get_current_site(request).domain
+            reset_path = reverse('account:password-reset-confirmed', kwargs={'uidb64': uidb64, 'token': token})
+            frontend_base_url = getattr(settings, 'FRONTEND_BASE_URL')
+            reset_url = f"{frontend_base_url}/change-password/{uidb64}/{token}"
+            email_body = (
+                f"Hi {user.get_full_name() or user.email},\n\n"
+                f"Click the link below to reset your password:\n{reset_url}\n\n"
+                f"If you didn't request this, please ignore this email."
+            )
+            email_data = {
+                'subject': 'Password Reset Request',
+                'body': email_body,
+                'recipient': user.email,
             }
-            Utils.send_mail(data)
-        res = {
-            'message': 'Password Reset link sent to Your',
-            'status': status.HTTP_200_OK,
-            'uidb64': uidb64,
-            'token': token
-        }
-        return Response(res)
-        # return super().validate(attrs)
+            try:
+                Utils.send_mail(email_data)
+            except Exception as e:
+                logger.error(f"Failed to send password reset email to {email}: {str(e)}")
+                return Response({
+                    'message': 'An error occurred while sending the reset link. Please try again later.'
+                }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+            return Response({
+                'message': 'If an account exists with this email, a password reset link has been sent.'
+            }, status=status.HTTP_200_OK)
+        except Exception as e:
+            logger.error(f"Unexpected error in password reset: {str(e)}")
+            return Response({
+                'message': 'An unexpected error occurred. Please try again later.'
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+    def send_reset_email(self, email_data):
+        """
+        Utility method to send password reset email.
+        Replace with your Utils.send_mail implementation or use Django's send_mail.
+        """
+        send_mail(
+            subject=email_data['subject'],
+            message=email_data['body'],
+            from_email=settings.DEFAULT_FROM_EMAIL,
+            recipient_list=[email_data['recipient']],
+            fail_silently=False,
+        )
+# class RequestPasswordResetAPIView(generics.GenericAPIView):
+#     serializer_class = RequestNewPasswordSerializer
+#     permission_classes = [AllowAny]
+#     def post(self, request, *args, **kwargs):
+#         serializer = self.serializer_class(data=request.data)
+#         email = request.data['email']
+#         if CustomUser.objects.filter(email=email).exists():
+#             user = CustomUser.objects.get(email=email)
+#             uidb64 = urlsafe_base64_encode(smart_bytes(user.id))
+#             token = PasswordResetTokenGenerator().make_token(user)
+#             current_site = get_current_site(request=request).domain
+#             dRelativeLink = reverse(
+#                 'account:password-reset-confirmed', kwargs={'uidb64': uidb64, 'token': token})
+#             django_absUrl = 'http://' + current_site + dRelativeLink
+
+#             local_host = 'https://neatstorez.vercel.app/account/'
+#             relativeLink = 'change-password/'+uidb64+' /'+token
+#             absUrl = local_host+relativeLink
+#             body = 'Hi  Click on the Link below to change your password \n' + absUrl
+#             data = {
+#                 'body': body, "recipient": user.email,
+#                 "subject": "Password Reset Link"
+#             }
+#             Utils.send_mail(data)
+#         res = {
+#             'message': 'Password Reset link sent to Your',
+#             'status': status.HTTP_200_OK,
+#             'uidb64': uidb64,
+#             'token': token
+#         }
+#         return Response(res)
+#         # return super().validate(attrs)
 
 
 class PasswordTokenAPIView(generics.GenericAPIView):

@@ -128,6 +128,12 @@ REST_FRAMEWORK = {
         'rest_framework.permissions.IsAuthenticated',
     ),
      'DATE_INPUT_FORMATS': [("%Y-%m-%d")],
+     'DEFAULT_THROTTLE_CLASSES': [
+        'rest_framework.throttling.AnonRateThrottle',
+    ],
+    'DEFAULT_THROTTLE_RATES': {
+        'anon': '10/hour',  # Limit to 10 requests per hour per IP
+    }
 }
 
 
@@ -166,3 +172,11 @@ SIMPLE_JWT = {
     'TOKEN_REFRESH_SERIALIZER': 'rest_framework_simplejwt.serializers.TokenRefreshSerializer',
 }
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+FRONTEND_BASE_URL=os.getenv('FRONTEND_BASE_URL')
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER=os.getenv('EMAIL_ADDRESS')
+EMAIL_HOST_PASSWORD=os.getenv('EMAIL_PASSWORD')
+DEFAULT_FROM_EMAIL=os.getenv('EMAIL_ADDRESS')

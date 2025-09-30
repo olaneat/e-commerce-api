@@ -6,7 +6,8 @@ from decimal import Decimal
 from django.db import transaction
 import uuid
 User = get_user_model()
-
+import random
+import string
 
 
 
@@ -17,7 +18,7 @@ class ItemSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Item
-        fields = ['id', 'name', 'price', 'img', 'shipping_cost', 'total_price', 'total_shipping_cost']
+        fields = ['id', 'name', 'price', 'img', 'shipping_cost', 'total_price', 'total_shipping_cost', 'quantity']
 
 
     def get_total_price(self, obj):
@@ -46,7 +47,7 @@ class OrderItemSerializer(serializers.ModelSerializer):
         return representation
 
 class OrderSerializer(serializers.ModelSerializer):
-    # callbackurl = serializers.CharField(required=False,allow_blank=True, )
+    callback_url = serializers.URLField(required=False, write_only=True, allow_blank=True)
     items = serializers.ListField(
         child=serializers.DictField(child=serializers.CharField(allow_blank=True), allow_empty=False),
         allow_empty=False,
@@ -60,7 +61,7 @@ class OrderSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Order
-        fields = ['id', 'user', 'items', 'items_output', 'total_price', 'reference', 'created_at', 'updated_at', 'status', 'total_cost', 'payment_intent_id']
+        fields = ['id', 'user', 'items', 'items_output', 'total_price', 'reference', 'created_at', 'updated_at', 'status', 'total_cost', 'payment_intent_id', 'callback_url']
 
     def get_total_price(self, obj):
         return sum(Decimal(str(item.item.price)) * item.quantity for item in obj.orderitem_set.all())
@@ -68,21 +69,24 @@ class OrderSerializer(serializers.ModelSerializer):
     def get_total_cost(self, obj):
         return sum((Decimal(str(item.item.price)) + Decimal(str(item.item.shipping_cost))) * item.quantity for item in obj.orderitem_set.all())
 
-    def validate(self, data):
-        items_data = data.get('items', [])
-        user = self.context['request'].user
-        existing_orders = Order.objects.filter(user=user, status__in=['pending_payment', 'processing'])
-        for order in existing_orders:
-            order_items = {(oi.item.name, str(oi.item.price)) for oi in order.orderitem_set.all()}
-            new_items = {(item['name'], str(Decimal(item['price']))) for item in items_data}
-            if order_items & new_items:  # Check for intersection
-                raise serializers.ValidationError("An order with these items already exists and is pending or processing.")
-        return data
+    def _generate_mixed_alphanumeric_reference(self, length=6):
+        """Generate a mixed alphanumeric reference (e.g., A1B2C3D4)."""
+        characters = []
+        for _ in range(length // 2):  # Half for letters, half for numbers
+            characters.append(random.choice(string.ascii_letters))
+            characters.append(random.choice(string.digits))
+        # Fill the last position if length is odd
+        if length % 2:
+            characters.append(random.choice(string.ascii_letters + string.digits))
+        random.shuffle(characters)  # Mix the order further
+        reference =  ''.join(characters)
+        if not Order.objects.filter(reference=reference).exists():
+            return reference
 
     def create(self, validated_data):
-        from django.db import transaction
         items_data = validated_data.pop('items')
-        reference = str(uuid.uuid4().int % 100000).zfill(5)  # 5-digit reference
+        callback_url = validated_data.pop('callback_url', None)
+        reference = self._generate_mixed_alphanumeric_reference(length=6) # 5 alpha number reference
         with transaction.atomic():
             order = Order.objects.create(reference=reference, **validated_data)
             aggregated_items = {}

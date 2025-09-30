@@ -26,21 +26,25 @@ class InitiatePaymentView(APIView):
                 'message': 'No items provided',
                 'status_code': status.HTTP_400_BAD_REQUEST
             }, status=status.HTTP_400_BAD_REQUEST)
-        serializer = OrderSerializer(data={'items': items_data, 'status': 'pending_payment'}, context={'request': request})
+        callback_url = data.get('callback_url')
+        print('call', callback_url)
+        serializer = OrderSerializer(data={'items': items_data, 'status': 'pending_payment', 'callback_url': callback_url}, context={'request': request})
         if serializer.is_valid():
             order = serializer.save()
             payment_intent =  f"pi_{order.id}"
             order.payment_intent_id = payment_intent
             order.save()
-            # total_cost =
-            # default= 
             payment_url = 'https://api.paystack.co/transaction/initialize'
             amount_in_kobo = int(order.total_amount * 100) 
+            
+            callback_url = serializer.validated_data.get('callback_url')
+        
+            print(callback_url, 'call back')
             payload = {
                 'reference': order.reference,
                 'email': request.user.email,
                 'amount': amount_in_kobo,
-                "callback_url": "https://neatstorez.vercel.app/verify-payment"
+                "callback_url": callback_url
             }
             headers = {
                 'Authorization': f'Bearer {config("PAYSTACK_SK")}',

@@ -1,10 +1,11 @@
 .env
 *pyc
 dockerfile
-fly.toml
 */migrations/*
 __pycache__
-.DS_Store
+**/.DS_Store
 /history
 /staticfiles_build/
-manage.py
+**/.manage.py
+*/migrations/*.py
+!*/migrations/__init__.py

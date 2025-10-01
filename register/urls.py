@@ -19,7 +19,7 @@ urlpatterns = [
          name='request-password'),
     path('password-reset/<uidb64>/<token>/',
          PasswordTokenAPIView.as_view(), name='password-reset-confirmed'),
-    path('password-reset-successful',
+    path('password-reset-successful/',
          CreatePasswordAPI.as_view(), name='password_changed'),
     path('<uuid:pk>/change-password',
          ChangePasswordAPI.as_view(), name="change-password"),
@@ -31,3 +31,6 @@ urlpatterns = [
 
 '''path('reset_password', include('django_rest_passwordreset.urls', namespace='password_reset')),
                 path('reset_password/confirm', include('django_rest_passwordreset.urls', namespace='password_reset'))'''
+
+
+

@@ -91,34 +91,51 @@ class CreatePasswordSerializer(serializers.Serializer):
         min_length=1, max_length=50, write_only=True)
     token = serializers.CharField(
         min_length=1, max_length=50, write_only=True)
-    uidb64 = serializers.CharField(
+    uuidb64 = serializers.CharField(
         min_length=1, max_length=250, write_only=True)
 
     class Meta:
-        fields = ['password', 'token', 'uidb64']
+        fields = ['password', 'confirm_password']
 
+   
     def validate(self, attrs):
-        try:
-            password = attrs.get('password')
-            confirm_password = attrs.get('confirm_password')
-            token = attrs.get('token')
-            uidb64 = attrs.get('uidb64')
+        password = attrs.get('password')
+        confirm_password = attrs.get('confirm_password')
 
-            id = force_str(urlsafe_base64_decode(uidb64))
-            user = CustomUser.objects.get(id=id)
-            if password != confirm_password:
-                raise serializers.ValidationError('password didnt match')
+        if password != confirm_password:
+            raise serializers.ValidationError({"confirm_password": "Passwords do not match."})
 
-            if not PasswordResetTokenGenerator().check_token(user, token):
-                raise Exception()
+        # Optional: Add additional password validation (e.g., complexity)
+        if len(password) < 8:  # Example: Enforce minimum length
+            raise serializers.ValidationError({"password": "Password must be at least 8 characters long."})
 
-            user.set_password(password)
-            user.save()
-            return user
-        except Exception as e:
-            print(e)
-
+        # if not any(c.isupper() for c in password):
+        #     raise serializers.ValidationError({"password": "Password must contain at least one uppercase letter."})
+        # if not any(c.isdigit() for c in password):
+        #     raise serializers.ValidationError({"password": "Password must contain at least one digit."})
         return attrs
+    # def validate(self, attrs):
+    #     try:
+    #         password = attrs.get('password')
+    #         confirm_password = attrs.get('confirm_password')
+    #         token = attrs.get('token')
+    #         uidb64 = attrs.get('uidb64')
+
+    #         id = force_str(urlsafe_base64_decode(uidb64))
+    #         user = CustomUser.objects.get(id=id)
+    #         if password != confirm_password:
+    #             raise serializers.ValidationError('password didnt match')
+
+    #         if not PasswordResetTokenGenerator().check_token(user, token):
+    #             raise Exception()
+
+    #         user.set_password(password)
+    #         user.save()
+    #         return user
+    #     except Exception as e:
+    #         print(e)
+
+    #     return attrs
 
 
 class ChangePasswordSerializer(serializers.Serializer):

@@ -13,6 +13,8 @@ from django.contrib.sites.shortcuts import get_current_site
 from django.conf import settings
 from rest_framework.throttling import AnonRateThrottle
 from django.core.mail import send_mail
+from .models import PasswordResetToken
+from django.utils import timezone
 
 from .serializers import (
     RegistrationSerializer, CreatePasswordSerializer, 
@@ -171,11 +173,12 @@ class RequestPasswordResetAPIView(generics.GenericAPIView):
                 }, status=status.HTTP_200_OK)
 
             uidb64 = urlsafe_base64_encode(smart_bytes(user.id))
-            token = PasswordResetTokenGenerator().make_token(user)     
+            token = PasswordResetTokenGenerator().make_token(user) 
+            PasswordResetToken.objects.create(user=user, token=token)    
             current_site = get_current_site(request).domain
             reset_path = reverse('account:password-reset-confirmed', kwargs={'uidb64': uidb64, 'token': token})
             frontend_base_url = getattr(settings, 'FRONTEND_BASE_URL')
-            reset_url = f"{frontend_base_url}/change-password/{uidb64}/{token}"
+            reset_url = f"{frontend_base_url}/reset-password?uuid64={uidb64}&token={token}"
             email_body = (
                 f"Hi {user.get_full_name() or user.email},\n\n"
                 f"Click the link below to reset your password:\n{reset_url}\n\n"
@@ -203,53 +206,21 @@ class RequestPasswordResetAPIView(generics.GenericAPIView):
                 'message': 'An unexpected error occurred. Please try again later.'
             }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-    def send_reset_email(self, email_data):
-        """
-        Utility method to send password reset email.
-        Replace with your Utils.send_mail implementation or use Django's send_mail.
-        """
-        send_mail(
-            subject=email_data['subject'],
-            message=email_data['body'],
-            from_email=settings.DEFAULT_FROM_EMAIL,
-            recipient_list=[email_data['recipient']],
-            fail_silently=False,
-        )
-# class RequestPasswordResetAPIView(generics.GenericAPIView):
-#     serializer_class = RequestNewPasswordSerializer
-#     permission_classes = [AllowAny]
-#     def post(self, request, *args, **kwargs):
-#         serializer = self.serializer_class(data=request.data)
-#         email = request.data['email']
-#         if CustomUser.objects.filter(email=email).exists():
-#             user = CustomUser.objects.get(email=email)
-#             uidb64 = urlsafe_base64_encode(smart_bytes(user.id))
-#             token = PasswordResetTokenGenerator().make_token(user)
-#             current_site = get_current_site(request=request).domain
-#             dRelativeLink = reverse(
-#                 'account:password-reset-confirmed', kwargs={'uidb64': uidb64, 'token': token})
-#             django_absUrl = 'http://' + current_site + dRelativeLink
-
-#             local_host = 'https://neatstorez.vercel.app/account/'
-#             relativeLink = 'change-password/'+uidb64+' /'+token
-#             absUrl = local_host+relativeLink
-#             body = 'Hi  Click on the Link below to change your password \n' + absUrl
-#             data = {
-#                 'body': body, "recipient": user.email,
-#                 "subject": "Password Reset Link"
-#             }
-#             Utils.send_mail(data)
-#         res = {
-#             'message': 'Password Reset link sent to Your',
-#             'status': status.HTTP_200_OK,
-#             'uidb64': uidb64,
-#             'token': token
-#         }
-#         return Response(res)
-#         # return super().validate(attrs)
-
+    # def send_reset_email(self, email_data):
+    #     """
+    #     Utility method to send password reset email.
+    #     Replace with your Utils.send_mail implementation or use Django's send_mail.
+    #     """
+    #     send_mail(
+    #         subject=email_data['subject'],
+    #         message=email_data['body'],
+    #         from_email=settings.DEFAULT_FROM_EMAIL,
+    #         recipient_list=[email_data['recipient']],
+    #         fail_silently=False,
+    #     )
 
 class PasswordTokenAPIView(generics.GenericAPIView):
+    permission_classes = [AllowAny]
     def get_queryset(self, request, uidb64, token):
         try:
             id = smart_str(urlsafe_base64_decode(uidb64))
@@ -270,11 +241,90 @@ class PasswordTokenAPIView(generics.GenericAPIView):
 
 class CreatePasswordAPI(generics.GenericAPIView):
     serializer_class = CreatePasswordSerializer
+    permission_classes = [AllowAny]
 
-    def patch(self, request):
-        serializer = self.serializers_class(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        return Response({'success': True, 'message': 'Password changed Successfully'}, status=status.HTTP_200_OK)
+    def post(self, request, *args, **kwargs):
+        try:
+            # Extract uidb64 and token from query parameters
+            uidb64 = request.query_params.get('uuidb64')
+            token = request.query_params.get('token')
+
+            if not uidb64 or not token:
+                return Response(
+                    {"message": "Missing uidb64 or token in query parameters."},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+
+            # Check if token has already been used
+            try:
+                reset_token = PasswordResetToken.objects.get(token=token)
+                if reset_token.used_at is not None:
+                    return Response(
+                        {"message": "This password reset link has already been used."},
+                        status=status.HTTP_400_BAD_REQUEST
+                    )
+            except PasswordResetToken.DoesNotExist:
+                return Response(
+                    {"message": "Invalid token."},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+
+            # Validate serializer (password and confirm_password)
+            serializer = self.get_serializer(data=request.data)
+            serializer.is_valid(raise_exception=True)
+            password = serializer.validated_data['password']
+
+            # Decode user ID
+            try:
+                user_id = smart_str(urlsafe_base64_decode(uidb64))
+                user = CustomUser.objects.get(id=user_id)
+            except (TypeError, ValueError, OverflowError, CustomUser.DoesNotExist):
+                return Response(
+                    {"message": "Invalid user ID."},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+
+            # Verify token
+            if not PasswordResetTokenGenerator().check_token(user, token):
+                return Response(
+                    {"message": "Invalid or expired token."},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+
+            # Ensure token belongs to the user
+            if reset_token.user != user:
+                return Response(
+                    {"message": "Token does not match user."},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+
+            # Update password
+            user.set_password(password)
+            user.save()
+
+            # Mark token as used
+            reset_token.used_at = timezone.now()
+            reset_token.save()
+
+            return Response(
+                {
+                    "success": True,
+                    "message": "Password changed successfully.",
+                    "status": status.HTTP_200_OK
+                },
+                status=status.HTTP_200_OK
+            )
+
+        except Exception as e:
+            logger.error(f"Error in password reset confirmation: {str(e)}")
+            return Response(
+                {"message": "An error occurred. Please try again."},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+    # def patch(self, request):
+    #     serializer = self.serializer_class(data=request.data)
+    #     serializer.is_valid(raise_exception=True)
+    #     return Response({'success': True, 'message': 'Password changed Successfully', 'status':status.HTTP_200_OK}, )
 
 
 # class ChangePasswordAPI(generics.UpdateAPIView):

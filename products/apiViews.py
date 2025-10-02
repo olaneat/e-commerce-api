@@ -7,7 +7,8 @@ from .serializers import (
     ListManufactuererSerializer,                     
     CreateProductSerializer, 
     ProductDetailSerializer,
-    ManufacturerDetailSerializer
+    SearchSerializer,
+    ManufacturerDetailSerializer,
     )
 
 from rest_framework.views import APIView
@@ -16,6 +17,10 @@ from rest_framework import permissions
 from rest_framework import status
 from rest_framework.views import Response
 from rest_framework import status
+from django.db.models import Q
+import logging
+
+logger = logging.getLogger(__name__)
 
 class CreateProductAPIView(generics.CreateAPIView):
     lookup_field = 'id'
@@ -139,3 +144,46 @@ class ProductsByCategoryAPIView(APIView):
         # permission_classes = [permissions.IsAuthenticatedOrReadOnly]
         return Response({'data':serializer.data, 'status': status.HTTP_200_OK, 'msg': 'products fetched successful'})
 
+
+
+class SearchAPIView(APIView):
+    permission_classes = [permissions.AllowAny]
+    # serializer_class = [SearchSerializer]
+    def get(self, request, *args, **kwargs):
+        try:
+            query = request.query_params.get('q', '').strip()
+            if not query:
+                return Response(
+                    {"results": []},
+                    status=status.HTTP_200_OK
+                )
+
+            # Search products and categories
+            product_results = ProductModel.objects.filter(
+                Q(name__icontains=query)
+            )[:5]  # Limit to 5 results
+            category_results = CategoryModel.objects.filter(
+                Q(name__icontains=query)
+            )[:5]
+
+            # Combine results
+            suggestions = [
+                {"id": product.id, "name": product.name, "type": "product"}
+                for product in product_results
+            ] + [
+                {"id": category.id, "name": category.name, "type": "category"}
+                for category in category_results
+            ]
+
+            serializer = SearchSerializer(suggestions, many=True)
+            return Response(
+                 serializer.data,
+                status=status.HTTP_200_OK
+            )
+
+        except Exception as e:
+            logger.error(f"Error in search suggestions: {str(e)}")
+            return Response(
+                {"message": "An error occurred while fetching suggestions."},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )

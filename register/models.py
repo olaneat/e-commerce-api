@@ -84,3 +84,17 @@ class CustomUser(AbstractUser):
         ordering = ('email',)
 
     objects = CustomManager()
+
+class PasswordResetToken(models.Model):
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='password_reset_tokens')
+    token = models.CharField(max_length=100, unique=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    used_at = models.DateTimeField(null=True, blank=True)  # Tracks when token was used
+
+    class Meta:
+        indexes = [
+            models.Index(fields=['token']),
+        ]
+
+    def __str__(self):
+        return f"Token for {self.user.email} (Used: {self.used_at is not None})"

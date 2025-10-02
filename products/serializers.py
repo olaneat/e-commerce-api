@@ -151,3 +151,9 @@ class CreateManufacturerSerializer(serializers.ModelSerializer):
         return category
     '''
 
+
+
+class SearchSerializer(serializers.Serializer):
+    id = serializers.CharField(max_length=200)
+    name = serializers.CharField(max_length=200)
+    type = serializers.CharField(max_length=20)

@@ -141,8 +141,9 @@ class ProductsByCategoryAPIView(APIView):
         lookup_field = 'id'
         products = ProductModel.objects.filter(category_id=id)
         serializer =  ListProductSerializer(products, many=True)
+        category = CategoryModel.objects.get(id=id)
         # permission_classes = [permissions.IsAuthenticatedOrReadOnly]
-        return Response({'data':serializer.data, 'status': status.HTTP_200_OK, 'msg': 'products fetched successful'})
+        return Response({'data':serializer.data, 'status': status.HTTP_200_OK, 'msg': 'products fetched successful', 'category': category.name})
 
 
 

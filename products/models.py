@@ -58,7 +58,7 @@ class ProductModel(models.Model):
     available= models.BooleanField(default=True)
     stock = models.IntegerField(default=1)
     model = models.CharField(max_length=255, blank=True,null=True)
-    colour= models.CharField(max_length=255, blank=True,null=True)
+    colour= models.JSONField(default=list, blank=True, null=True)
     weight = models.CharField(max_length=255, blank=True,null=True)
     brand = models.CharField(max_length=255, blank=True,null=True)
     wlan = models.CharField(max_length=255, blank=True,null=True)
@@ -67,7 +67,7 @@ class ProductModel(models.Model):
     front_camera = models.CharField(max_length=255, blank=True,null=True)
     connectivity = models.CharField(max_length=255, blank=True,null=True)
     bluetooth = models.CharField(max_length=255, blank=True,null=True)
-    size = models.CharField(max_length=255, blank=True,null=True)
+    size = models.JSONField(default=list, blank=True, null=True)
     sku = models.CharField(max_length=255, blank=True,null=True)
     line = models.CharField(max_length=255, blank=True,null=True)
     processor = models.CharField(max_length=255, blank=True,null=True)
@@ -88,5 +88,8 @@ class ProductModel(models.Model):
         return self.name
 
 
-
+    @property
+    def image_url(self):
+        # Generate the full Cloudinary URL
+        return cloudinary.utils.cloudinary_url(self.image.public_id)[0]
 # class ReviewModel(models.Model):

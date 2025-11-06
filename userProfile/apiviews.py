@@ -10,7 +10,7 @@ from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
 
 
 class CreateUserProfileAPIView(generics.CreateAPIView):
-    queryset = UserProfileModel.objects.all()
+    # queryset = UserProfileModel.objects.all()
     serializer_class = UserProfileSerializer
     permission_classes = [permissions.IsAuthenticated]
     
@@ -35,6 +35,25 @@ class CreateUserProfileAPIView(generics.CreateAPIView):
     
 
 class UpdateProfile(generics.UpdateAPIView):
+    """
+    API view for updating a user's profile.
+
+    This view allows authenticated users to partially update their profile information.
+    It uses the `UserProfileSerializer` to validate and serialize the data, and supports
+    multipart, form, and JSON data formats. The update method provides a structured
+    JSON response indicating success or error, with appropriate status codes.
+
+    Attributes:
+        lookup_field (str): The field used to identify the user profile (user_id).
+        serializer_class (Serializer): Serializer for user profile data.
+        queryset (QuerySet): Queryset of all user profiles.
+        permission_classes (list): Permissions required to access this view.
+        parser_classes (list): Parsers supported for incoming data.
+
+    Methods:
+        update(request, *args, **kwargs):
+            Handles the update operation with custom response formatting and error handling.
+    """
     lookup_field = 'user_id'
     serializer_class = UserProfileSerializer
     queryset = UserProfileModel.objects.all()

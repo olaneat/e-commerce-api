@@ -1,4 +1,4 @@
 #!/bin/bash
 pip install -r requirements.txt
 python manage.py collectstatic --noinput --clear
-python manage.py migrate  # If using DB
+python manage.py migrate

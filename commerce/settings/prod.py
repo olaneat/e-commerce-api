@@ -2,7 +2,7 @@
 from .base import *
 import os
 DEBUG = False
-ALLOWED_HOSTS = [  'https://neatstorez.vercel.app/']
+ALLOWED_HOSTS = [  'https://neatstorez.vercel.app/', 'neat-storez-api.vercel.app']
 CORS_ALLOWED_ORIGINS = ['https://neatstorez.vercel.app']
 DATABASES = {
     'default': dj_database_url.parse(

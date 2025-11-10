@@ -2,23 +2,23 @@
 from pathlib import Path
 from datetime import timedelta
 import os
-from dotenv import load_dotenv
 from decouple import config
 import cloudinary
 import dj_database_url
 
-
-load_dotenv()  # Load .env file if using
-
+if os.path.exists(os.path.join(Path(__file__).resolve().parent.parent.parent, '.env')):
+    from dotenv import load_dotenv
+    load_dotenv()
 # Build paths inside the project like this: BASE_DIR / 'subdir'
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
 # Security settings
-SECRET_KEY = os.environ.get('SECRET_KEY', )
-DEBUG = False  # Default to False, override in environment-specific files
+SECRET_KEY = os.environ['SECRET_KEY']                   
+DEBUG = False
+ # Default to False, override in environment-specific files
 # ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', 'localhost').split(',')
 # ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'https://emrkt.vercel.app/']
-PAYSTACK_SK=os.environ.get('PAYSTACK_SK')
+PAYSTACK_SK=os.environ['PAYSTACK_SK']
 # Application definition
 INSTALLED_APPS = [
     'django.contrib.sites',
@@ -143,14 +143,14 @@ REST_FRAMEWORK = {
 
 # Cloudinary
 import cloudinary
-cloudinary_url = os.environ.get('CLOUDINARY_URL')
+cloudinary_url = os.environ['CLOUDINARY_URL']
 if cloudinary_url:
     cloudinary.config(cloudinary_url=cloudinary_url)
 else:
     cloudinary.config(
-        cloud_name=os.environ.get('CLOUD_NAME'),
-        api_key=os.environ.get('CLOUD_API_KEY'),
-        api_secret=os.environ.get('CLOUD_SECRET_KEY')
+        cloud_name=os.environ['CLOUD_NAME'],
+        api_key=os.environ['CLOUD_API_KEY'],
+        api_secret=os.environ['CLOUD_SECRET_KEY']
     )
 SWAGGER_SETTINGS = {
     'SECURITY_DEFINITIONS': {

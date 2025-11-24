@@ -2,15 +2,16 @@ from rest_framework.response import Response
 from rest_framework import permissions 
 from rest_framework.views import APIView
 from rest_framework.generics import RetrieveAPIView
-from rest_framework import generics, viewsets, status
+from rest_framework import generics, filters
 from .serializers import OrderSerializer, ItemSerializer, OrderListSerializer, VerifyPaymentSeializer
 from .models import Order, Item
-from django.conf import settings
+from .orderFilter import OrderFilter
 from decouple import config
 import requests
-import uuid
-from django.http import JsonResponse
+from django_filters.rest_framework import DjangoFilterBackend
 from django.views.decorators.csrf import csrf_exempt
+from rest_framework import status
+
 # from .models import OrderReference
 
 
@@ -60,7 +61,7 @@ class InitiatePaymentView(APIView):
                 paystack_data = payment_response.json()
                 if paystack_data.get('status'):
                     payment_url = paystack_data['data']['authorization_url']
-                    order.status = 'processing'
+                    order.status = 'pending_payment'
                     order.save()
                     return Response({
                         'success': True,
@@ -105,98 +106,35 @@ class ListOrdersView(generics.ListAPIView):
     lookup_field = 'id'
     permission_classes = [permissions.IsAuthenticated]
     serializer_class = OrderListSerializer
-    queryset = Order.objects.all()
 
-
+    def get_queryset(self):
+        user = self.request.user
+        # queryset = Order.objects.all()
+        orders = Order.objects.filter(user=user).order_by('-created_at')
+        return orders
+    # user = self.request.user
+    #     print("CURRENT USER:", user.id, user.email)  # ← DEBUG LINE
+    #     orders = Order.objects.filter(user=user).order_by('-created_at')
+    #     print("ORDERS FOUND FOR USER:", orders.count(), [o.id for o in orders])
+    #     return orders
+    
+    filter_backends = [
+        DjangoFilterBackend,
+        filters.SearchFilter,
+        filters.OrderingFilter,
+    ]
+    filterset_class = OrderFilter
+    # filterset_fields = {
+    #     'status': ['icontains'],           # ← Works for ?status=pending
+    #     'reference': ['exact', 'icontains'],
+    #     # add more if you want
+    # }
+    search_fields = ['reference']
 class DeleteOrderView(generics.DestroyAPIView):
     # lookup_field = 'id'
     permission_classes = [permissions.IsAdminUser]
     serializer_class = OrderSerializer
     queryset = Order.objects.all()
-
-
-
-
-class VerifyPaymentAPIView(APIView):
-    permission_classes = [permissions.IsAuthenticated]
-    serializer_class=VerifyPaymentSeializer
-
-    def get(self, request, reference):
-        url = f'https://api.paystack.co/transaction/verify/{reference}'
-        headers = {
-            'Authorization': f'Bearer {config("PAYSTACK_SK")}',
-            'Content-Type': 'application/json'
-        }
-
-        try:
-            response = requests.get(url, headers=headers)
-            paystack_response_data = response.json()
-
-            if paystack_response_data['status'] and paystack_response_data['data']['status'] == 'success':
-                # Implement your business logic for a successful payment here.
-                order = Order.objects.get(reference=reference)  # Assuming reference is unique for Order
-                order.status = 'processing'
-                order.save()
-                return Response({'status': 'success', 'message': 'Payment successfully verified', 'data': paystack_response_data['data']})
-            else:
-                return Response({'status': 'failed', 'message': 'Payment could not be verified'},
-                                status=status.HTTP_400_BAD_REQUEST)
-
-        except requests.exceptions.RequestException as e:
-            return Response({'error': 'An error occurred while verifying the payment'},
-                            status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
-# @csrf_exempt
-# def verify_payment(request):
-#     print(request.POST.get('reference'))
-#     if request.method == 'POST':
-#         reference = request.POST.get('reference')
-#         if not reference:
-#             return JsonResponse({'error': 'Reference is required'}, status=400)
-
-#         # Paystack Verify Transaction API endpoint
-#         url = f"https://api.paystack.co/transaction/verify/{reference}"
-#         headers = {
-#             'Authorization': f'Bearer {config("PAYSTACK_SK")}',
-#             'Content-Type': 'application/json'
-#         }
-
-#         try:
-#             response = requests.get(url, headers=headers)
-#             response_data = response.json()
-
-#             if response.status_code == 200 and response_data['data']['status'] == 'success':
-#                 # Update Payment model
-#                 payment = Payment.objects.get(ref=reference)
-#                 payment.verified = True
-#                 payment.save()
-
-#                 # Update associated Order status
-#                 order = Order.objects.get(reference=reference)  # Assuming reference is unique for Order
-#                 order.status = Order.PROCESSING
-#                 order.save()
-
-#                 return JsonResponse({
-#                     'status': 'success',
-#                     'message': 'Payment and order verified',
-#                     'data': response_data['data'],
-#                     'order_status': order.status
-#                 })
-#             else:
-#                 return JsonResponse({
-#                     'status': 'failed',
-#                     'message': 'Payment verification failed',
-#                     'data': response_data.get('data', {})
-#                 }, status=400)
-
-#         except Payment.DoesNotExist:
-#             return JsonResponse({'error': 'Payment not found'}, status=404)
-#         except Order.DoesNotExist:
-#             return JsonResponse({'error': 'Order not found'}, status=404)
-#         except Exception as e:
-#             return JsonResponse({'error': str(e)}, status=500)
-
-#     return JsonResponse({'error': 'Invalid request method'}, status=405)
 
 
 
@@ -238,3 +176,12 @@ class PaymentCallbackView(APIView):
                 'order_id': str(order.id),
                 'payment_url': f"https://checkout.paystack.com/{order.payment_intent_id}"
             }, status=status.HTTP_402_PAYMENT_REQUIRED)
+        
+
+class OrderDetail(RetrieveAPIView):
+    lookup_field = 'id'
+    serializer_class = OrderSerializer
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    queryset = Order.objects.all()
+   
+    

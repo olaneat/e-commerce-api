@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     'corsheaders',
     'drf_yasg',
     "phonenumber_field",
+    'django_filters',
 
     'register',
     'userProfile',
@@ -133,7 +134,12 @@ REST_FRAMEWORK = {
     ],
     'DEFAULT_THROTTLE_RATES': {
         'anon': '100/hour',  # Limit to 10 requests per hour per IP
-    }
+    },
+    'DEFAULT_FILTER_BACKENDS': [
+        'django_filters.rest_framework.DjangoFilterBackend',
+        'rest_framework.filters.SearchFilter',
+        'rest_framework.filters.OrderingFilter',
+    ]
 }
 
 

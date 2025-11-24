@@ -91,6 +91,7 @@ class OrderSerializer(serializers.ModelSerializer):
             order = Order.objects.create(reference=reference, **validated_data)
             aggregated_items = {}
             for item_data in items_data:
+                print(item_data, 'item')
                 price = Decimal(item_data.get('price', '0'))
                 shipping_cost = Decimal(str(item_data.get('shippingCost', '0')))
                 key = (item_data['name'], str(price))
@@ -100,7 +101,8 @@ class OrderSerializer(serializers.ModelSerializer):
                         'price': price,
                         'img': item_data.get('img', ''),
                         'shipping_cost': shipping_cost,
-                        'quantity': 0
+                        'quantity': 0,
+                        'status':item_data.get('status')
                     }
                 try:
                     quantity = int(item_data.get('quantity', 1))
@@ -127,7 +129,7 @@ class OrderListSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Order
-        fields = ['id', 'items', 'reference']
+        fields = ['id', 'items', 'reference', 'status', 'created_at']
 
 
 

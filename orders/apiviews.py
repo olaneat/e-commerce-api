@@ -17,7 +17,6 @@ from rest_framework import status
 
 class InitiatePaymentView(APIView):
     permission_classes = [permissions.IsAuthenticated]
-
     def post(self, request):
         data = request.data.copy()
         items_data = data.pop('items', [])
@@ -28,7 +27,6 @@ class InitiatePaymentView(APIView):
                 'status_code': status.HTTP_400_BAD_REQUEST
             }, status=status.HTTP_400_BAD_REQUEST)
         callback_url = data.get('callback_url')
-        print('call', callback_url)
         serializer = OrderSerializer(data={'items': items_data, 'status': 'pending_payment', 'callback_url': callback_url}, context={'request': request})
         if serializer.is_valid():
             order = serializer.save()
@@ -39,8 +37,6 @@ class InitiatePaymentView(APIView):
             amount_in_kobo = int(order.total_amount * 100) 
             
             callback_url = serializer.validated_data.get('callback_url')
-        
-            print(callback_url, 'call back')
             payload = {
                 'reference': order.reference,
                 'email': request.user.email,
@@ -75,11 +71,9 @@ class InitiatePaymentView(APIView):
                             'payment_url': payment_url
                         }
                     }, status=status.HTTP_201_CREATED)
-
                 else:
                     raise Exception(paystack_data.get('message', 'Payment initialization failed'))
             except requests.exceptions.RequestException as e:
-                print(f"Paystack API error: {e}")
                 order.status = 'pending_payment'
                 order.save()
                 return Response({
@@ -94,7 +88,6 @@ class InitiatePaymentView(APIView):
                         'total_amount': str(order.total_amount)
                     }
                 }, status=status.HTTP_402_PAYMENT_REQUIRED)
-        print(f"Serializer errors: {serializer.errors}")
         return Response({
             'success': False,
             'message': 'Validation error',
@@ -177,7 +170,34 @@ class PaymentCallbackView(APIView):
                 'payment_url': f"https://checkout.paystack.com/{order.payment_intent_id}"
             }, status=status.HTTP_402_PAYMENT_REQUIRED)
         
+class VerifyPaymentAPIView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+    serializer_class=VerifyPaymentSeializer
 
+    def get(self, request, reference):
+        url = f'https://api.paystack.co/transaction/verify/{reference}'
+        headers = {
+            'Authorization': f'Bearer {config("PAYSTACK_SK")}',
+            'Content-Type': 'application/json'
+        }
+
+        try:
+            response = requests.get(url, headers=headers)
+            paystack_response_data = response.json()
+
+            if paystack_response_data['status'] and paystack_response_data['data']['status'] == 'success':
+                # Implement your business logic for a successful payment here.
+                order = Order.objects.get(reference=reference)  # Assuming reference is unique for Order
+                order.status = 'processing'
+                order.save()
+                return Response({'status': 'success', 'message': 'Payment successfully verified', 'data': paystack_response_data['data']})
+            else:
+                return Response({'status': 'failed', 'message': 'Payment could not be verified'},
+                                status=status.HTTP_400_BAD_REQUEST)
+
+        except requests.exceptions.RequestException as e:
+            return Response({'error': 'An error occurred while verifying the payment'},
+                            status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 class OrderDetailAPIView(RetrieveAPIView):
     lookup_field = 'id'
     serializer_class = OrderSerializer

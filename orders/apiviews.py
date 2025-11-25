@@ -178,10 +178,13 @@ class PaymentCallbackView(APIView):
             }, status=status.HTTP_402_PAYMENT_REQUIRED)
         
 
-class OrderDetail(RetrieveAPIView):
+class OrderDetailAPIView(RetrieveAPIView):
     lookup_field = 'id'
     serializer_class = OrderSerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
-    queryset = Order.objects.all()
-   
+
+    def get_queryset(self):
+        id= self.id
+        order = Order.objects.get(id=id)
+        return order
     

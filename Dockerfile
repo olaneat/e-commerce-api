@@ -13,4 +13,5 @@ RUN pip install -r requirements.txt
 EXPOSE 8000
 
 # Define the entry point for the container
-CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
+
+CMD ["gunicorn", "--bind", "0.0.0.0:8000", "commerce.wsgi:application"]

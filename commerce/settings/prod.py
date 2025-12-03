@@ -1,7 +1,7 @@
 # commerce/settings/production.py
 from .base import *
 import os
-DEBUG = False
+DEBUG = True
 ALLOWED_HOSTS = [  'https://neatstorez.vercel.app/', 'neat-storez-api.vercel.app']
 CORS_ALLOWED_ORIGINS = ['https://neatstorez.vercel.app']
 DATABASES = {

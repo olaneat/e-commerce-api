@@ -5,8 +5,10 @@ DEBUG = False
 ALLOWED_HOSTS = [  'https://neatstorez.vercel.app/', 'neat-storez-api.vercel.app']
 CORS_ALLOWED_ORIGINS = ['https://neatstorez.vercel.app']
 DATABASES = {
-    'default': dj_database_url.parse(
-        os.environ.get('PROD_DB_URL')
+    'default': dj_database_url.config(
+        default=config("PROD_DB_URL"),
+        conn_max_age=600,
+        ssl_require=True
     )
 }
 DATABASES['default']['CONN_MAX_AGE'] = 600

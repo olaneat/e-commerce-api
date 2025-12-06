@@ -3,7 +3,7 @@ from .base import *
 import os
 DEBUG = True
 ALLOWED_HOSTS = [  'e-mrkt-api.onrender.com']
-CORS_ALLOWED_ORIGINS = ['https://neatstorez.vercel.app', 'localhost']
+CORS_ALLOWED_ORIGINS = ['https://neatstorez.vercel.app', "https://localhost", "http://localhost"]
 DATABASES = {
     'default': dj_database_url.config(
         default=config("PROD_DB_URL"),

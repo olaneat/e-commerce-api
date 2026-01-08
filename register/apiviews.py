@@ -100,6 +100,8 @@ class LoginAPIView(generics.GenericAPIView):
                             'id': self.request.user.id,
                             'email': self.request.user.email,
                             'username': self.request.user.username,
+                            'is_admin': self.request.user.is_superuser,
+                            "is_statff": self.request.user.is_staff
                         }
                     # 'first_name': self.request.user.user_profile.first_name,
                     # 'last_name': self.request.user.user_profile.last_name,

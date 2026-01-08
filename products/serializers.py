@@ -4,7 +4,11 @@ from .models import ProductModel, CategoryModel, ManufacturerModel
 
 
 class CreateProductSerializer(serializers.ModelSerializer):
-    
+    # size = serializers.ListField(
+    #     child=serializers.CharField(max_length=20),
+    #     allow_empty=True,
+    #     required=False
+    # )
     class Meta:
         model = ProductModel
         fields = [

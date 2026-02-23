@@ -3,7 +3,7 @@ from .base import *
 
 DEBUG = True
 ALLOWED_HOSTS = ['localhost']
-CORS_ALLOWED_ORIGINS = [ "http://localhost:5173"]
+CORS_ALLOWED_ORIGINS = [ "http://localhost:5173", "http://localhost:5174" ]
 
 # Use a local database (e.g., SQLite for development)
 DATABASES = {

@@ -35,7 +35,7 @@ schema_view = get_schema_view(
 )
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
+    # path('admin/', admin.site.urls),
     path('account/', include('register.urls', namespace='account')),
     path('profile/', include('userProfile.urls', namespace='user-profile')),
     path('products/', include('products.urls', namespace='products')),
@@ -43,6 +43,7 @@ urlpatterns = [
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     path('swagger/', schema_view.with_ui('swagger',cache_timeout=0), name='schema-swagger-ui'),
     path('orders/', include('orders.urls', namespace='orders')),
+    path('admin/', include('admin.urls', namespace='admin-section')),
 
     # path('swagger/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
     path('redoc/', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),

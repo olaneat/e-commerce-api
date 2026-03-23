@@ -11,6 +11,7 @@ import requests
 from django_filters.rest_framework import DjangoFilterBackend
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework import status
+from rest_framework.pagination import PageNumberPagination
 
 # from .models import OrderReference
 
@@ -99,17 +100,33 @@ class ListOrdersView(generics.ListAPIView):
     lookup_field = 'id'
     permission_classes = [permissions.IsAuthenticated]
     serializer_class = OrderListSerializer
-
+    
     def get_queryset(self):
         user = self.request.user
-        # queryset = Order.objects.all()
         orders = Order.objects.filter(user=user).order_by('-created_at')
         return orders
-    # user = self.request.user
-    #     print("CURRENT USER:", user.id, user.email)  # ← DEBUG LINE
-    #     orders = Order.objects.filter(user=user).order_by('-created_at')
-    #     print("ORDERS FOUND FOR USER:", orders.count(), [o.id for o in orders])
-    #     return orders
+    
+    def list(self, request, *args, **kwargs):
+        queryset = self.get_queryset()
+        
+        # Apply pagination
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+        
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
+    
+    @property
+    def paginator(self):
+        """Return the paginator instance."""
+        if not hasattr(self, '_paginator'):
+            self._paginator = PageNumberPagination()
+            self._paginator.page_size = 10
+            self._paginator.page_size_query_param = 'page_size'
+            self._paginator.max_page_size = 100
+        return self._paginator
     
     filter_backends = [
         DjangoFilterBackend,
@@ -123,6 +140,15 @@ class ListOrdersView(generics.ListAPIView):
     #     # add more if you want
     # }
     search_fields = ['reference']
+
+    def get_pagination_class(self):
+        pagination = super().get_pagination_class()
+        if pagination:
+            pagination.default_limit = 10
+            pagination.limit_query_param = 'limit'
+            pagination.offset_query_param = 'offset'
+            pagination.max_limit = 100
+        return pagination
 class DeleteOrderView(generics.DestroyAPIView):
     # lookup_field = 'id'
     permission_classes = [permissions.IsAdminUser]

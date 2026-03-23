@@ -19,6 +19,7 @@ from rest_framework.views import Response
 from rest_framework import status
 from django.db.models import Q
 import logging
+from rest_framework.pagination import LimitOffsetPagination,  PageNumberPagination
 
 logger = logging.getLogger(__name__)
 
@@ -33,6 +34,48 @@ class ListProductAPIView(generics.ListAPIView):
     serializer_class = ListProductSerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
     queryset = ProductModel.objects.all()
+
+    def get_queryset(self):
+        return ProductModel.objects.all()
+    
+    def list(self, request, *args, **kwargs):
+        queryset = self.get_queryset()
+        
+        # Apply pagination
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+        
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
+    
+    @property
+    def paginator(self):
+        """Return the paginator instance."""
+        if not hasattr(self, '_paginator'):
+            from rest_framework.pagination import PageNumberPagination
+            self._paginator = PageNumberPagination()
+            self._paginator.page_size = 10
+            self._paginator.page_size_query_param = 'page_size'
+            self._paginator.max_page_size = 100
+        return self._paginator
+    
+    def paginate_queryset(self, queryset):
+        """Paginate the queryset."""
+        return self.paginator.paginate_queryset(queryset, self.request, view=self)
+    
+    def get_paginated_response(self, data):
+        """Return a paginated response."""
+        return self.paginator.get_paginated_response(data)
+    # def get_pagination_class(self):
+    #     pagination = super().get_pagination_class()
+    #     if pagination:
+    #         pagination.default_limit = 10
+    #         pagination.limit_query_param = 'limit'
+    #         pagination.offset_query_param = 'offset'
+    #         pagination.max_limit = 100
+    #     return pagination
 
 
 
@@ -75,6 +118,16 @@ class CategoryListAPIView(generics.ListAPIView):
     serializer_class = CategorySerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
     queryset = CategoryModel.objects.all()
+    pagination_class = LimitOffsetPagination
+
+    def get_pagination_class(self):
+        pagination = super().get_pagination_class()
+        if pagination:
+            pagination.default_limit = 10
+            pagination.limit_query_param = 'limit'
+            pagination.offset_query_param = 'offset'
+            pagination.max_limit = 100
+        return pagination
 
 class CategoryDetailAPIView(generics.RetrieveAPIView):
     lookup_field = 'id'
@@ -109,9 +162,19 @@ class ManufacturerListAPIView(generics.ListAPIView):
     serializer_class = ListManufactuererSerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
     queryset = ManufacturerModel.objects.all()
+    pagination_class = LimitOffsetPagination
 
+    def get_pagination_class(self):
+        pagination = super().get_pagination_class()
+        if pagination:
+            pagination.default_limit = 10
+            pagination.limit_query_param = 'limit'
+            pagination.offset_query_param = 'offset'
+            pagination.max_limit = 100
+        return pagination
 
 class OtherProductsAPIView(APIView):
+    pagination_class = LimitOffsetPagination
 
     def get(self, request, id=None):
         lookup_field = 'id'
@@ -120,7 +183,14 @@ class OtherProductsAPIView(APIView):
         # permission_classes = [permissions.IsAuthenticatedOrReadOnly]
         return Response({'data':serializer.data, 'status': status.HTTP_200_OK, 'msg': 'products fetched successful'})
 
-
+    def get_pagination_class(self):
+        pagination = super().get_pagination_class()
+        if pagination:
+            pagination.default_limit = 10
+            pagination.limit_query_param = 'limit'
+            pagination.offset_query_param = 'offset'
+            pagination.max_limit = 100
+        return pagination
 class DeleteManufacturerAPIView(generics.DestroyAPIView):
     lookup_field = 'id'
     serializer_class = ListManufactuererSerializer
@@ -136,7 +206,7 @@ class ManufacturerDetailAPIView(generics.RetrieveAPIView):
 
 class ProductsByCategoryAPIView(APIView):
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
-
+    pagination_class = LimitOffsetPagination
     def get(self, request, id=None):
         lookup_field = 'id'
         products = ProductModel.objects.filter(category_id=id)
@@ -144,13 +214,32 @@ class ProductsByCategoryAPIView(APIView):
         category = CategoryModel.objects.get(id=id)
         # permission_classes = [permissions.IsAuthenticatedOrReadOnly]
         return Response({'data':serializer.data, 'status': status.HTTP_200_OK, 'msg': 'products fetched successful', 'category': category.name})
+    
+    def get_pagination_class(self):
+        pagination = super().get_pagination_class()
+        if pagination:
+            pagination.default_limit = 10
+            pagination.limit_query_param = 'limit'
+            pagination.offset_query_param = 'offset'
+            pagination.max_limit = 100
+        return pagination
 
-
+    def get_pagination_class(self):
+        pagination = super().get_pagination_class()
+        if pagination:
+            pagination.default_limit = 10
+            pagination.limit_query_param = 'limit'
+            pagination.offset_query_param = 'offset'
+            pagination.max_limit = 100
+        return pagination
+        
 
 class SearchAPIView(APIView):
     permission_classes = [permissions.AllowAny]
+    pagination_class = LimitOffsetPagination
     # serializer_class = [SearchSerializer]
     def get(self, request, *args, **kwargs):
+
         try:
             query = request.query_params.get('q', '').strip()
             if not query:
@@ -188,3 +277,12 @@ class SearchAPIView(APIView):
                 {"message": "An error occurred while fetching suggestions."},
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
+    
+    def get_pagination_class(self):
+        pagination = super().get_pagination_class()
+        if pagination:
+            pagination.default_limit = 10
+            pagination.limit_query_param = 'limit'
+            pagination.offset_query_param = 'offset'
+            pagination.max_limit = 100
+        return pagination

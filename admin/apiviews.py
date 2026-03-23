@@ -1,11 +1,9 @@
 from orders.models import Order, Item, OrderItem
-from products.models import ProductModel, CategoryModel
 from rest_framework import generics, permissions, filters
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from orders.serializers import OrderSerializer, ItemSerializer, OrderListSerializer, VerifyPaymentSeializer
+from orders.serializers import OrderListSerializer
 from django_filters.rest_framework import DjangoFilterBackend
-from .serializers import  RevenueAnalyticsSerializer, RevenueDataPointSerializer
 from rest_framework import status
 from django.db.models import Sum
 from django.db.models.functions import TruncDay, TruncWeek, TruncMonth, TruncYear

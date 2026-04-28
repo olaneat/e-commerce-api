@@ -19,7 +19,7 @@ from rest_framework.views import Response
 from rest_framework import status
 from django.db.models import Q
 import logging
-from rest_framework.pagination import LimitOffsetPagination,  PageNumberPagination
+from rest_framework.pagination import PageNumberPagination
 
 logger = logging.getLogger(__name__)
 
@@ -54,7 +54,6 @@ class ListProductAPIView(generics.ListAPIView):
     def paginator(self):
         """Return the paginator instance."""
         if not hasattr(self, '_paginator'):
-            from rest_framework.pagination import PageNumberPagination
             self._paginator = PageNumberPagination()
             self._paginator.page_size = 10
             self._paginator.page_size_query_param = 'page_size'
@@ -68,14 +67,7 @@ class ListProductAPIView(generics.ListAPIView):
     def get_paginated_response(self, data):
         """Return a paginated response."""
         return self.paginator.get_paginated_response(data)
-    # def get_pagination_class(self):
-    #     pagination = super().get_pagination_class()
-    #     if pagination:
-    #         pagination.default_limit = 10
-    #         pagination.limit_query_param = 'limit'
-    #         pagination.offset_query_param = 'offset'
-    #         pagination.max_limit = 100
-    #     return pagination
+   
 
 
 
@@ -118,7 +110,6 @@ class CategoryListAPIView(generics.ListAPIView):
     serializer_class = CategorySerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
     queryset = CategoryModel.objects.all()
-    pagination_class = LimitOffsetPagination
 
     def get_pagination_class(self):
         pagination = super().get_pagination_class()
@@ -162,7 +153,6 @@ class ManufacturerListAPIView(generics.ListAPIView):
     serializer_class = ListManufactuererSerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
     queryset = ManufacturerModel.objects.all()
-    pagination_class = LimitOffsetPagination
 
     def get_pagination_class(self):
         pagination = super().get_pagination_class()
@@ -174,7 +164,6 @@ class ManufacturerListAPIView(generics.ListAPIView):
         return pagination
 
 class OtherProductsAPIView(APIView):
-    pagination_class = LimitOffsetPagination
 
     def get(self, request, id=None):
         lookup_field = 'id'
@@ -206,7 +195,6 @@ class ManufacturerDetailAPIView(generics.RetrieveAPIView):
 
 class ProductsByCategoryAPIView(APIView):
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
-    pagination_class = LimitOffsetPagination
     def get(self, request, id=None):
         lookup_field = 'id'
         products = ProductModel.objects.filter(category_id=id)
@@ -236,7 +224,6 @@ class ProductsByCategoryAPIView(APIView):
 
 class SearchAPIView(APIView):
     permission_classes = [permissions.AllowAny]
-    pagination_class = LimitOffsetPagination
     # serializer_class = [SearchSerializer]
     def get(self, request, *args, **kwargs):
 

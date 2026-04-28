@@ -1,16 +1,18 @@
 from orders.models import Order, Item, OrderItem
+from products.models import ProductModel, CategoryModel
 from rest_framework import generics, permissions, filters
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from orders.serializers import OrderListSerializer
+from orders.serializers import OrderSerializer, ItemSerializer, OrderListSerializer, VerifyPaymentSeializer
 from django_filters.rest_framework import DjangoFilterBackend
+from .serializers import  RevenueAnalyticsSerializer, RevenueDataPointSerializer
 from rest_framework import status
 from django.db.models import Sum
 from django.db.models.functions import TruncDay, TruncWeek, TruncMonth, TruncYear
 from django.utils import timezone
 from datetime import timedelta, datetime
 from dateutil.relativedelta import relativedelta
-from rest_framework.pagination import PageNumberPagination
+
 from orders.orderFilter import OrderFilter
 
 class StatusCountAPI(APIView):
@@ -38,32 +40,17 @@ class DisplayOrders(generics.ListAPIView):
     serializer_class = OrderListSerializer
 
     def get_queryset(self):
+        # user = self.request.user
+        # queryset = Order.objects.all()
         orders = Order.objects.all()
+        # orders = Order.objects.filter.order_by('-created_at')
         return orders
+    # user = self.request.user
+    #     print("CURRENT USER:", user.id, user.email)  # ← DEBUG LINE
+    #     orders = Order.objects.filter(user=user).order_by('-created_at')
+    #     print("ORDERS FOUND FOR USER:", orders.count(), [o.id for o in orders])
+    #     return orders
     
-    def list(self, request, *args, **kwargs):
-        queryset = self.get_queryset()
-        
-        # Apply pagination
-        page = self.paginate_queryset(queryset)
-        if page is not None:
-            serializer = self.get_serializer(page, many=True)
-            return self.get_paginated_response(serializer.data)
-        
-        serializer = self.get_serializer(queryset, many=True)
-        return Response(serializer.data)
-    
-    @property
-    def paginator(self):
-        """Return the paginator instance."""
-        if not hasattr(self, '_paginator'):
-            self._paginator = PageNumberPagination()
-            self._paginator.page_size = 10
-            self._paginator.page_size_query_param = 'page_size'
-            self._paginator.max_page_size = 100
-        return self._paginator
-    
-
     filter_backends = [
         DjangoFilterBackend,
         filters.SearchFilter,

@@ -20,11 +20,12 @@ class UserProfileModel(models.Model):
     phone_number = models.CharField(blank=True, null=True)
     profile_image = CloudinaryField('image', blank=True, null=True)
     
-@receiver(post_save, sender=CustomUser)
-def create_profile(sender, instance, created, **kwargs):
-    if created:
-        UserProfileModel.objects.create(user=instance)
+# @receiver(post_save, sender=CustomUser)
+# def create_profile(sender, instance, created, **kwargs):
+#     if created:
+#         UserProfileModel.objects.create(user=instance)
 
-@receiver(post_save, sender=CustomUser)
-def save_profile(sender, instance, **kwargs):
-    instance.user_profile.save()
+# @receiver(post_save, sender=CustomUser)
+# def save_profile(sender, instance, **kwargs):
+#     UserProfileModel.objects.get_or_create(user=instance)
+    # instance.user_profile.save()
